@@ -8,3 +8,11 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+@layer components {
+  .canvas-screen {
+    background-image: radial-gradient(#ffffff11 2px, transparent 1px);
+    background-size: 25px 25px;
+    @apply w-screen h-screen;
+  }
+}

@@ -1,6 +1,8 @@
+import Canvas from "./components/Canvas"
+
 const App = () => {
   return (
-    <div>App</div>
+    <Canvas />
   )
 }
 
