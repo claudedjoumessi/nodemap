@@ -1,8 +1,11 @@
 import React from 'react'
+import Node from './Node'
 
 const Canvas = () => {
   return (
-    <div className='canvas-screen'>Canvas</div>
+    <div className='canvas-screen'>
+      <Node />
+    </div>
   )
 }
 
