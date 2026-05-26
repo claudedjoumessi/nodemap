@@ -1,6 +1,13 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: "Space Grotesk";
+  src: url("/fonts/SpaceGrotesk.ttf") format("truetype");
+}
+
+
 :root {
+  font-family: "Space Grotesk";
   letter-spacing: 0.18px;
   color-scheme: light dark;
   font-synthesis: none;
