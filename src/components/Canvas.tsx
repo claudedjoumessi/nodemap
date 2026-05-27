@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Node from "./Node";
-import type { TNode } from "../lib/types";
+import type { PendingConnection, Connection, TNode } from "../lib/types";
+import BezierLayer from "./BezierLayer";
 
 const Canvas = () => {
   const nodesData: TNode[] = [
@@ -14,34 +15,40 @@ const Canvas = () => {
     {
       id: "m",
       name: "Add",
-      position: { x: 160, y: 240 },
-      inputs: [{ id: "I1", name: "X" }, { id: "I2", name: "Y" }],
+      position: { x: 450, y: 500 },
+      inputs: [
+        { id: "I1", name: "X" },
+        { id: "I2", name: "Y" },
+      ],
       outputs: [{ id: "O1", name: "Result" }],
     },
   ];
 
   const [nodes, setNodes] = useState(nodesData);
-  const [dragging, setDragging] = useState<{
+  const [nodeDragging, setNodeDragging] = useState<{
     id: string;
     offsetX: number;
     offsetY: number;
   } | null>(null);
+  const [connections, setConnections] = useState<Connection[]>([]);
+  const [pendingConnection, setPendingConnection] = useState<PendingConnection | null>(null);
 
+  // Node Dragging Logic
   const handleMouseUp = () => {
-    setDragging(null);
+    setNodeDragging(null);
+    setPendingConnection(null);
   };
+
   const handleMouseMove = (e: React.MouseEvent) => {
-    if (!dragging) return;
+    if(pendingConnection) {
+      const instaConn = { ...pendingConnection, currentX: e.clientX, currentY: e.clientY }
+      setPendingConnection(instaConn)
+    }
+    if (!nodeDragging) return;
     setNodes((prev) =>
       prev.map((n) =>
-        n.id === dragging.id // <- Finding exact dragged node
-          ? {
-              ...n,
-              position: {
-                x: e.clientX - dragging.offsetX,
-                y: e.clientY - dragging.offsetY,
-              }
-            }
+        n.id === nodeDragging.id
+          ? { ...n, position: { x: e.clientX - nodeDragging.offsetX, y: e.clientY - nodeDragging.offsetY } }
           : n,
       ),
     );
@@ -49,22 +56,53 @@ const Canvas = () => {
 
   const onDragStart = (id: string, e: React.MouseEvent) => {
     const node = nodes.find((n) => n.id === id)!;
-    setDragging({
+    setNodeDragging({
       id,
       offsetX: e.clientX - node.position.x,
       offsetY: e.clientY - node.position.y,
     });
-    console.log(node);
+  };
+
+  // Connection Logic
+  // let canvas know about the moment we click on a noodle (ok)
+  // get its (x, y) of output and setup an pending connection (ok)
+  // if we leave upon an input, finalize by setting a real connection
+  // otherwise cancel, and reset pending connection.
+  // also we can't connect from an input to an output. It is Out -> In.
+  const handleConnection = (
+    id: string,
+    portId: string,
+    portType: "input" | "output",
+    ref: React.RefObject<HTMLDivElement | null>,
+  ) => {
+    if (!ref.current) return;
+    if (portType === "input") return;
+
+    const rect = ref.current.getBoundingClientRect();
+    const portX = rect.left + rect.width / 2;
+    const portY = rect.top + rect.height / 2;
+
+    setPendingConnection({
+      sourceNodeId: id,
+      sourcePortId: portId,
+      sourceX: portX,
+      sourceY: portY,
+      currentX: portX,
+      currentY: portY,
+    });
+
   };
 
   return (
     <div
+      id="canvasScreen"
       className="canvas-screen"
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
     >
+      <BezierLayer pendingConnection={pendingConnection} connections={connections} />
       {nodes.map((n) => (
-        <Node key={n.id} node={n} onDragStart={onDragStart} />
+        <Node key={n.id} node={n} onDragStart={onDragStart} onPortClick={handleConnection} />
       ))}
     </div>
   );

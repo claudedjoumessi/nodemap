@@ -28,7 +28,7 @@
   .node {
     --node-x-padding: 8px;
     --noodle-size: 10px;
-    @apply absolute w-40 flex flex-col bg-neutral-800 rounded-lg;
+    @apply absolute w-40 flex flex-col bg-neutral-800 rounded-lg select-none;
   }
   .node-header {
     padding: 4px var(--node-x-padding);
