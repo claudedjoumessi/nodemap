@@ -25,21 +25,38 @@
 
   /* Node */
   .node {
-    @apply w-40 flex flex-col bg-neutral-800 rounded-lg;
+    --node-x-padding: 8px;
+    --noodle-size: 10px;
+    @apply absolute top-4 left-4 w-40 flex flex-col bg-neutral-800 rounded-lg;
   }
   .node-header {
-    @apply flex items-center gap-1 px-2 py-1 bg-emerald-900 rounded-t-lg;
+    padding: 4px var(--node-x-padding);
+    @apply flex items-center gap-1 bg-emerald-900 rounded-t-lg;
   }
   .node-body {
-    @apply flex flex-col gap-1 p-2;
+    padding: var(--node-x-padding);
+    @apply flex flex-col gap-1;
   }
   .node-ports {
     @apply w-full flex flex-col;
   }
   .port {
-    @apply flex;
+    @apply flex items-center relative px-1.5;
+  }
+  .port .port-noodle {
+    width: var(--noodle-size);
+    height: var(--noodle-size);
+    @apply absolute bg-emerald-600 rounded-full border border-white/40;
   }
   .node-outputs {
     @apply items-end;
+  }
+  .node-outputs .port .port-noodle {
+    @apply right-0;
+    transform: translateX(calc(100% + var(--node-x-padding) - (var(--noodle-size) / 2)));
+  }
+  .node-inputs .port .port-noodle {
+    @apply left-0;
+    transform: translateX(calc(-100% - var(--node-x-padding) + (var(--noodle-size) / 2)));
   }
 }
