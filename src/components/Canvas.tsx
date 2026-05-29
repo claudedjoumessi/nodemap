@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import Node from "./Node";
-import type { PendingEdge, Connection, TNode } from "../lib/types";
+import type { PendingConnection, Connection, TNode } from "../lib/types";
 import BezierLayer from "./BezierLayer";
+import { nanoid } from "nanoid";
 
 const Canvas = () => {
   const nodesData: TNode[] = [
@@ -31,18 +32,40 @@ const Canvas = () => {
     offsetY: number;
   } | null>(null);
   const [connections, setConnections] = useState<Connection[]>([]);
-  const [pendingEdge, setPendingEdge] = useState<PendingEdge | null>(null);
+  const [pendingConnection, setPendingConnection] =
+    useState<PendingConnection | null>(null);
+
+  // Port Global Registry
+  const portRefs = useRef<Record<string, HTMLDivElement>>({});
+
+  const registerPort = (
+    nodeId: string,
+    portId: string,
+    el: HTMLDivElement | null,
+  ) => {
+    if (el) portRefs.current[`${nodeId}.${portId}`] = el;
+  };
+
+  const getPortPos = (nodeId: string, portId: string) => {
+    const portEl = portRefs.current[`${nodeId}.${portId}`];
+    const portRect = portEl.getBoundingClientRect();
+
+    return {
+      portX: portRect.left + portRect.width / 2,
+      portY: portRect.top + portRect.height / 2,
+    };
+  };
 
   // Node Dragging Logic
   const handleMouseUp = () => {
     setNodeDragging(null);
-    setPendingEdge(null);
+    setPendingConnection(null);
   };
 
   const handleMouseMove = (e: React.MouseEvent) => {
-    if (pendingEdge) {
-      setPendingEdge({
-        ...pendingEdge,
+    if (pendingConnection) {
+      setPendingConnection({
+        ...pendingConnection,
         currentX: e.clientX,
         currentY: e.clientY,
       });
@@ -70,33 +93,37 @@ const Canvas = () => {
       offsetX: e.clientX - node.position.x,
       offsetY: e.clientY - node.position.y,
     });
+    console.log(portRefs.current);
   };
 
   // Connection Logic
-  // let canvas know about the moment we click on a noodle (ok)
-  // get its (x, y) of output and setup an pending connection (ok)
-  // if we leave upon an input, finalize by setting a real connection
-  // otherwise cancel, and reset pending connection.
-  // also we can't connect from an input to an output. It is Out -> In.
-  const handleConnection = (
-    id: string,
-    portId: string,
-    portType: "input" | "output",
-    ref: React.RefObject<HTMLDivElement | null>,
-  ) => {
-    if (!ref.current) return;
-    if (portType === "input") return;
+  const handlePendingConnection = (nodeId: string, portId: string) => {
+    const { portX, portY } = getPortPos(nodeId, portId);
 
-    const rect = ref.current.getBoundingClientRect();
-    const portX = rect.left + rect.width / 2;
-    const portY = rect.top + rect.height / 2;
-
-    setPendingEdge({
+    setPendingConnection({
+      sourceNodeId: nodeId,
+      sourcePortId: portId,
       sourceX: portX,
       sourceY: portY,
       currentX: portX,
       currentY: portY,
     });
+  };
+
+  const handleConnection = (nodeId: string, portId: string) => {
+    if (!pendingConnection) return;
+    if (nodeId === pendingConnection.sourceNodeId) return;
+
+    setConnections((prev) => [
+      ...prev,
+      {
+        id: `${nanoid()}`,
+        sourceNodeId: pendingConnection.sourceNodeId,
+        sourcePortId: pendingConnection.sourcePortId,
+        targetNodeId: nodeId,
+        targetPortId: portId,
+      },
+    ]);
   };
 
   return (
@@ -106,13 +133,19 @@ const Canvas = () => {
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
     >
-      <BezierLayer pendingEdge={pendingEdge} />
+      <BezierLayer
+        pendingEdge={pendingConnection}
+        connections={connections}
+        portRefs={portRefs}
+      />
       {nodes.map((n) => (
         <Node
           key={n.id}
           node={n}
+          registerPort={registerPort}
           onDragStart={onDragStart}
-          onPortClick={handleConnection}
+          onPortClick={handlePendingConnection}
+          onInputMouseUp={handleConnection}
         />
       ))}
     </div>

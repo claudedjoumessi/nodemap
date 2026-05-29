@@ -1,23 +1,28 @@
 import { ChevronDown } from "lucide-react";
 import type { TNode } from "../lib/types";
 import type React from "react";
-import { useRef, useState } from "react";
+import { useState } from "react";
 
 type NodeProps = {
   node: TNode;
-  onDragStart: (id: string, e: React.MouseEvent) => void;
-  onPortClick: (
-    id: string,
+  registerPort: (
+    nodeId: string,
     portId: string,
-    portType: "input" | "output",
-    ref: React.RefObject<HTMLDivElement | null>,
+    el: HTMLDivElement | null,
   ) => void;
+  onDragStart: (nodeId: string, e: React.MouseEvent) => void;
+  onPortClick: (nodeId: string, portId: string) => void;
+  onInputMouseUp: (nodeId: string, portId: string) => void;
 };
 
-const Node = ({ node, onDragStart, onPortClick }: NodeProps) => {
+const Node = ({
+  node,
+  registerPort,
+  onDragStart,
+  onPortClick,
+  onInputMouseUp,
+}: NodeProps) => {
   const [grabbing, setGrabbing] = useState(false);
-  const inputRef = useRef<HTMLDivElement | null>(null);
-  const outputRef = useRef<HTMLDivElement | null>(null);
 
   const handleHeaderMouseDown = (e: React.MouseEvent) => {
     setGrabbing(true);
@@ -25,7 +30,10 @@ const Node = ({ node, onDragStart, onPortClick }: NodeProps) => {
   };
 
   return (
-    <div className="node" style={{ top: node.position.y, left: node.position.x }}>
+    <div
+      className="node"
+      style={{ top: node.position.y, left: node.position.x }}
+    >
       <div
         className={`node-header ${grabbing ? "cursor-grabbing" : "cursor-grab"}`}
         onMouseDown={(e) => handleHeaderMouseDown(e)}
@@ -41,9 +49,9 @@ const Node = ({ node, onDragStart, onPortClick }: NodeProps) => {
             <div className="port" key={out.id}>
               <div className="port-name">{out.name}</div>
               <div
-                ref={outputRef}
+                ref={(el) => registerPort(node.id, out.id, el)}
                 className="port-noodle"
-                onMouseDown={() => onPortClick(node.id, out.id, "output", outputRef)}
+                onMouseDown={() => onPortClick(node.id, out.id)}
               ></div>
             </div>
           ))}
@@ -54,9 +62,9 @@ const Node = ({ node, onDragStart, onPortClick }: NodeProps) => {
             <div className="port" key={inp.id}>
               <div className="port-name">{inp.name}</div>
               <div
-                ref={inputRef}
+                ref={(el) => registerPort(node.id, inp.id, el)}
                 className="port-noodle"
-                onMouseDown={() => onPortClick(node.id, inp.id, "input", inputRef)}
+                onMouseUp={() => onInputMouseUp(node.id, inp.id)}
               ></div>
             </div>
           ))}

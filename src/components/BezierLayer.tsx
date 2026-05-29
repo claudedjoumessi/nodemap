@@ -1,7 +1,9 @@
-import type { PendingEdge } from "../lib/types";
+import type { Connection, PendingConnection } from "../lib/types";
 
 type BezierLayerProps = {
-  pendingEdge: PendingEdge | null;
+  pendingEdge: PendingConnection | null;
+  connections: Connection[];
+  portRefs: React.RefObject<Record<string, HTMLDivElement>>;
 };
 
 // Formula
@@ -10,9 +12,36 @@ type BezierLayerProps = {
 // (x2, y2) = (x3 - offset, y3)
 // offset = clamp(|x3 - x0| * 0.5, minOff, maxOff)
 
-const BezierLayer = ({ pendingEdge }: BezierLayerProps) => {
-  const offset = (x1: number, x2: number) => {
-    return Math.abs(x1 - x2) * 0.5
+const BezierLayer = ({
+  portRefs,
+  pendingEdge,
+  connections,
+}: BezierLayerProps) => {
+  const offset = (x1: number, x2: number, tension: number = 0.35) => {
+    return Math.abs(x1 - x2) * tension;
+  };
+
+  const getPortPos = (nodeId: string, portId: string) => {
+    const portEl = portRefs.current[`${nodeId}.${portId}`];
+    const portRect = portEl.getBoundingClientRect();
+
+    return {
+      portX: portRect.left + portRect.width / 2,
+      portY: portRect.top + portRect.height / 2,
+    };
+  };
+
+  const getConnectionPoints = (connection: Connection) => {
+    const { portX: x1, portY: y1 } = getPortPos(
+      connection.sourceNodeId,
+      connection.sourcePortId,
+    );
+    const { portX: x2, portY: y2 } = getPortPos(
+      connection.targetNodeId,
+      connection.targetPortId,
+    );
+
+    return { x1, y1, x2, y2 };
   };
 
   return (
@@ -28,11 +57,29 @@ const BezierLayer = ({ pendingEdge }: BezierLayerProps) => {
                 ${pendingEdge.currentX - offset(pendingEdge.currentX, pendingEdge.sourceX)} ${pendingEdge.currentY},
                 ${pendingEdge.currentX} ${pendingEdge.currentY}`}
           fill="none"
-          stroke="white"
+          className="stroke-white/90"
           strokeWidth={3}
-          strokeLinejoin="round"
+          strokeLinecap="round"
         />
       )}
+
+      {connections.map((c) => {
+        const { x1, y1, x2, y2 } = getConnectionPoints(c);
+
+        return (
+          <path
+            key={c.id}
+            d={`M ${x1} ${y1} 
+              C ${x1 + offset(x2, x1)} ${y1},
+                ${x2 - offset(x2, x1)} ${y2},
+                ${x2} ${y2}`}
+            fill="none"
+            className="stroke-emerald-700"
+            strokeWidth={3}
+            strokeLinecap="round"
+          />
+        );
+      })}
     </svg>
   );
 };
