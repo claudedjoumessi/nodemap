@@ -93,7 +93,7 @@ const Canvas = () => {
       offsetX: e.clientX - node.position.x,
       offsetY: e.clientY - node.position.y,
     });
-    console.log(portRefs.current);
+    console.log(connections);
   };
 
   // Connection Logic
@@ -113,6 +113,7 @@ const Canvas = () => {
   const handleConnection = (nodeId: string, portId: string) => {
     if (!pendingConnection) return;
     if (nodeId === pendingConnection.sourceNodeId) return;
+    if (checkRedundantConnection(nodeId, portId)) return;
 
     setConnections((prev) => [
       ...prev,
@@ -124,6 +125,12 @@ const Canvas = () => {
         targetPortId: portId,
       },
     ]);
+  };
+
+  const checkRedundantConnection = (destNodeId: string, destPortId: string) => {
+    return connections.find(
+      (c) => c.targetNodeId === destNodeId && c.targetPortId === destPortId,
+    );
   };
 
   return (
