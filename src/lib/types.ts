@@ -17,19 +17,20 @@ type Connection = {
   sourcePortId: string;
   toNodeId: string;
   toPortId: string;
+};
+
+type PendingEdge = {
   sourceX: number;
   sourceY: number;
   currentX: number;
   currentY: number;
 };
 
-type PendingConnection = {
-  sourceNodeId: string;
-  sourcePortId: string;
+type Edge = {
   sourceX: number;
   sourceY: number;
-  currentX: number;
-  currentY: number;
-};
+  toX: number;
+  toY: number;
+}
 
-export type { TNode, Port, Connection, PendingConnection };
+export type { TNode, Port, Connection, Edge, PendingEdge };

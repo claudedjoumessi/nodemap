@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import Node from "./Node";
-import type { PendingConnection, Connection, TNode } from "../lib/types";
+import type { PendingEdge, Connection, TNode } from "../lib/types";
 import BezierLayer from "./BezierLayer";
 
 const Canvas = () => {
@@ -31,24 +31,33 @@ const Canvas = () => {
     offsetY: number;
   } | null>(null);
   const [connections, setConnections] = useState<Connection[]>([]);
-  const [pendingConnection, setPendingConnection] = useState<PendingConnection | null>(null);
+  const [pendingEdge, setPendingEdge] = useState<PendingEdge | null>(null);
 
   // Node Dragging Logic
   const handleMouseUp = () => {
     setNodeDragging(null);
-    setPendingConnection(null);
+    setPendingEdge(null);
   };
 
   const handleMouseMove = (e: React.MouseEvent) => {
-    if(pendingConnection) {
-      const instaConn = { ...pendingConnection, currentX: e.clientX, currentY: e.clientY }
-      setPendingConnection(instaConn)
+    if (pendingEdge) {
+      setPendingEdge({
+        ...pendingEdge,
+        currentX: e.clientX,
+        currentY: e.clientY,
+      });
     }
     if (!nodeDragging) return;
     setNodes((prev) =>
       prev.map((n) =>
         n.id === nodeDragging.id
-          ? { ...n, position: { x: e.clientX - nodeDragging.offsetX, y: e.clientY - nodeDragging.offsetY } }
+          ? {
+              ...n,
+              position: {
+                x: e.clientX - nodeDragging.offsetX,
+                y: e.clientY - nodeDragging.offsetY,
+              },
+            }
           : n,
       ),
     );
@@ -82,15 +91,12 @@ const Canvas = () => {
     const portX = rect.left + rect.width / 2;
     const portY = rect.top + rect.height / 2;
 
-    setPendingConnection({
-      sourceNodeId: id,
-      sourcePortId: portId,
+    setPendingEdge({
       sourceX: portX,
       sourceY: portY,
       currentX: portX,
       currentY: portY,
     });
-
   };
 
   return (
@@ -100,9 +106,14 @@ const Canvas = () => {
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
     >
-      <BezierLayer pendingConnection={pendingConnection} connections={connections} />
+      <BezierLayer pendingEdge={pendingEdge} />
       {nodes.map((n) => (
-        <Node key={n.id} node={n} onDragStart={onDragStart} onPortClick={handleConnection} />
+        <Node
+          key={n.id}
+          node={n}
+          onDragStart={onDragStart}
+          onPortClick={handleConnection}
+        />
       ))}
     </div>
   );

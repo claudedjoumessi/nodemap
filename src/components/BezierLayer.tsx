@@ -1,8 +1,7 @@
-import type { Connection, PendingConnection } from "../lib/types";
+import type { PendingEdge } from "../lib/types";
 
 type BezierLayerProps = {
-  pendingConnection: PendingConnection | null;
-  connections: Connection[];
+  pendingEdge: PendingEdge | null;
 };
 
 // Formula
@@ -11,7 +10,7 @@ type BezierLayerProps = {
 // (x2, y2) = (x3 - offset, y3)
 // offset = clamp(|x3 - x0| * 0.5, minOff, maxOff)
 
-const BezierLayer = ({ pendingConnection, connections }: BezierLayerProps) => {
+const BezierLayer = ({ pendingEdge }: BezierLayerProps) => {
   const offset = (x1: number, x2: number) => {
     return Math.abs(x1 - x2) * 0.5
   };
@@ -22,12 +21,12 @@ const BezierLayer = ({ pendingConnection, connections }: BezierLayerProps) => {
       aria-label="Bezier Layer for connections"
       style={{ width: "100%", height: "100%" }}
     >
-      {pendingConnection && (
+      {pendingEdge && (
         <path
-          d={`M ${pendingConnection.sourceX} ${pendingConnection.sourceY} 
-              C ${pendingConnection.sourceX + offset(pendingConnection.currentX, pendingConnection.sourceX)} ${pendingConnection.sourceY},
-                ${pendingConnection.currentX - offset(pendingConnection.currentX, pendingConnection.sourceX)} ${pendingConnection.currentY},
-                ${pendingConnection.currentX} ${pendingConnection.currentY}`}
+          d={`M ${pendingEdge.sourceX} ${pendingEdge.sourceY} 
+              C ${pendingEdge.sourceX + offset(pendingEdge.currentX, pendingEdge.sourceX)} ${pendingEdge.sourceY},
+                ${pendingEdge.currentX - offset(pendingEdge.currentX, pendingEdge.sourceX)} ${pendingEdge.currentY},
+                ${pendingEdge.currentX} ${pendingEdge.currentY}`}
           fill="none"
           stroke="white"
           strokeWidth={3}
