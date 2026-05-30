@@ -67,9 +67,6 @@ const Canvas = () => {
         currentY: e.clientY,
       });
     }
-    /// TODO:
-    // 1 - Ensuring when disconnecting that the green line goes away
-    // 2 - Making the white line behave like a normal pending connection
     if (disconnecting) {
       setPendingConnection({
         sourceNodeId: disconnecting.sourceNodeId,
@@ -80,8 +77,8 @@ const Canvas = () => {
         currentY: e.clientY,
       });
 
-      setConnections(prev =>
-        disconnectAt(disconnecting.targetNodeId, disconnecting.targetPortId) ?? prev
+      setConnections(
+        (prev) => disconnectAt(disconnecting.targetNodeId, disconnecting.targetPortId) ?? prev,
       );
     }
     if (nodeDragging) {
@@ -98,7 +95,6 @@ const Canvas = () => {
             : n,
         ),
       );
-      console.log(connections);
     }
   };
 
@@ -151,10 +147,6 @@ const Canvas = () => {
       targetNodeId: nodeId,
       targetPortId: portId,
     });
-    console.log("Preparing for eventual disconnection");
-    // when we mouse down we send the signal.
-    // we then set a pending connect if-f we move away the noodle(port)
-    // w/ the current mouse position
   };
 
   // Checks if a connection is etablished at input nodeId.portId
@@ -167,9 +159,9 @@ const Canvas = () => {
   };
 
   const disconnectAt = (destNodeId: string, destPortId: string) => {
-    const delConn = checkConnection(destNodeId, destPortId)
-    if(!delConn) return
-    return connections.filter(c => c !== delConn)
+    const delConn = checkConnection(destNodeId, destPortId);
+    if (!delConn) return;
+    return connections.filter((c) => c !== delConn);
   };
 
   return (
