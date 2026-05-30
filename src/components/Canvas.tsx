@@ -32,17 +32,13 @@ const Canvas = () => {
     offsetY: number;
   } | null>(null);
   const [connections, setConnections] = useState<Connection[]>([]);
-  const [pendingConnection, setPendingConnection] =
-    useState<PendingConnection | null>(null);
+  const [pendingConnection, setPendingConnection] = useState<PendingConnection | null>(null);
+  const [disconnecting, setDisconnecting] = useState<Omit<Connection, "id"> | null>(null);
 
   // Port Global Registry
   const portRefs = useRef<Record<string, HTMLDivElement>>({});
 
-  const registerPort = (
-    nodeId: string,
-    portId: string,
-    el: HTMLDivElement | null,
-  ) => {
+  const registerPort = (nodeId: string, portId: string, el: HTMLDivElement | null) => {
     if (el) portRefs.current[`${nodeId}.${portId}`] = el;
   };
 
@@ -60,6 +56,7 @@ const Canvas = () => {
   const handleMouseUp = () => {
     setNodeDragging(null);
     setPendingConnection(null);
+    setDisconnecting(null);
   };
 
   const handleMouseMove = (e: React.MouseEvent) => {
@@ -70,20 +67,39 @@ const Canvas = () => {
         currentY: e.clientY,
       });
     }
-    if (!nodeDragging) return;
-    setNodes((prev) =>
-      prev.map((n) =>
-        n.id === nodeDragging.id
-          ? {
-              ...n,
-              position: {
-                x: e.clientX - nodeDragging.offsetX,
-                y: e.clientY - nodeDragging.offsetY,
-              },
-            }
-          : n,
-      ),
-    );
+    /// TODO:
+    // 1 - Ensuring when disconnecting that the green line goes away
+    // 2 - Making the white line behave like a normal pending connection
+    if (disconnecting) {
+      setPendingConnection({
+        sourceNodeId: disconnecting.sourceNodeId,
+        sourcePortId: disconnecting.sourcePortId,
+        sourceX: getPortPos(disconnecting.sourceNodeId, disconnecting.sourcePortId).portX,
+        sourceY: getPortPos(disconnecting.sourceNodeId, disconnecting.sourcePortId).portY,
+        currentX: e.clientX,
+        currentY: e.clientY,
+      });
+
+      setConnections(prev =>
+        disconnectAt(disconnecting.targetNodeId, disconnecting.targetPortId) ?? prev
+      );
+    }
+    if (nodeDragging) {
+      setNodes((prev) =>
+        prev.map((n) =>
+          n.id === nodeDragging.id
+            ? {
+                ...n,
+                position: {
+                  x: e.clientX - nodeDragging.offsetX,
+                  y: e.clientY - nodeDragging.offsetY,
+                },
+              }
+            : n,
+        ),
+      );
+      console.log(connections);
+    }
   };
 
   const onDragStart = (id: string, e: React.MouseEvent) => {
@@ -93,7 +109,6 @@ const Canvas = () => {
       offsetX: e.clientX - node.position.x,
       offsetY: e.clientY - node.position.y,
     });
-    console.log(connections);
   };
 
   // Connection Logic
@@ -113,7 +128,7 @@ const Canvas = () => {
   const handleConnection = (nodeId: string, portId: string) => {
     if (!pendingConnection) return;
     if (nodeId === pendingConnection.sourceNodeId) return;
-    if (checkRedundantConnection(nodeId, portId)) return;
+    if (checkConnection(nodeId, portId)) return;
 
     setConnections((prev) => [
       ...prev,
@@ -127,10 +142,34 @@ const Canvas = () => {
     ]);
   };
 
-  const checkRedundantConnection = (destNodeId: string, destPortId: string) => {
-    return connections.find(
-      (c) => c.targetNodeId === destNodeId && c.targetPortId === destPortId,
+  const handleDisconnect = (nodeId: string, portId: string) => {
+    const conn = checkConnection(nodeId, portId);
+    if (!conn) return;
+    setDisconnecting({
+      sourceNodeId: conn.sourceNodeId,
+      sourcePortId: conn.sourcePortId,
+      targetNodeId: nodeId,
+      targetPortId: portId,
+    });
+    console.log("Preparing for eventual disconnection");
+    // when we mouse down we send the signal.
+    // we then set a pending connect if-f we move away the noodle(port)
+    // w/ the current mouse position
+  };
+
+  // Checks if a connection is etablished at input nodeId.portId
+  const checkConnection = (destNodeId: string, destPortId: string) => {
+    return (
+      connections.find(
+        (c) => c.targetNodeId === destNodeId && c.targetPortId === destPortId,
+      ) ?? null
     );
+  };
+
+  const disconnectAt = (destNodeId: string, destPortId: string) => {
+    const delConn = checkConnection(destNodeId, destPortId)
+    if(!delConn) return
+    return connections.filter(c => c !== delConn)
   };
 
   return (
@@ -151,8 +190,9 @@ const Canvas = () => {
           node={n}
           registerPort={registerPort}
           onDragStart={onDragStart}
-          onPortClick={handlePendingConnection}
+          onOutputPortMouseDown={handlePendingConnection}
           onInputMouseUp={handleConnection}
+          onInputMouseDown={handleDisconnect}
         />
       ))}
     </div>

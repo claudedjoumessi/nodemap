@@ -12,11 +12,7 @@ type BezierLayerProps = {
 // (x2, y2) = (x3 - offset, y3)
 // offset = clamp(|x3 - x0| * 0.5, minOff, maxOff)
 
-const BezierLayer = ({
-  portRefs,
-  pendingEdge,
-  connections,
-}: BezierLayerProps) => {
+const BezierLayer = ({ portRefs, pendingEdge, connections }: BezierLayerProps) => {
   const offset = (x1: number, x2: number, tension: number = 0.35) => {
     return Math.abs(x1 - x2) * tension;
   };
@@ -50,18 +46,22 @@ const BezierLayer = ({
       aria-label="Bezier Layer for connections"
       style={{ width: "100%", height: "100%" }}
     >
-      {pendingEdge && (
-        <path
-          d={`M ${pendingEdge.sourceX} ${pendingEdge.sourceY} 
-              C ${pendingEdge.sourceX + offset(pendingEdge.currentX, pendingEdge.sourceX)} ${pendingEdge.sourceY},
-                ${pendingEdge.currentX - offset(pendingEdge.currentX, pendingEdge.sourceX)} ${pendingEdge.currentY},
+      {pendingEdge &&
+        (() => {
+          const { portX, portY } = getPortPos(pendingEdge.sourceNodeId, pendingEdge.sourcePortId)
+          return (
+            <path
+              d={`M ${portX} ${portY} 
+              C ${portX + offset(pendingEdge.currentX, portX)} ${portY},
+                ${pendingEdge.currentX - offset(pendingEdge.currentX, portX)} ${pendingEdge.currentY},
                 ${pendingEdge.currentX} ${pendingEdge.currentY}`}
-          fill="none"
-          className="stroke-white/90"
-          strokeWidth={3}
-          strokeLinecap="round"
-        />
-      )}
+              fill="none"
+              className="stroke-white/90"
+              strokeWidth={3}
+              strokeLinecap="round"
+            />
+          );
+        })()}
 
       {connections.map((c) => {
         const { x1, y1, x2, y2 } = getConnectionPoints(c);

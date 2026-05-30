@@ -11,16 +11,18 @@ type NodeProps = {
     el: HTMLDivElement | null,
   ) => void;
   onDragStart: (nodeId: string, e: React.MouseEvent) => void;
-  onPortClick: (nodeId: string, portId: string) => void;
+  onOutputPortMouseDown: (nodeId: string, portId: string) => void;
   onInputMouseUp: (nodeId: string, portId: string) => void;
+  onInputMouseDown: (nodeId: string, portId: string) => void;
 };
 
 const Node = ({
   node,
   registerPort,
   onDragStart,
-  onPortClick,
+  onOutputPortMouseDown,
   onInputMouseUp,
+  onInputMouseDown
 }: NodeProps) => {
   const [grabbing, setGrabbing] = useState(false);
 
@@ -51,8 +53,8 @@ const Node = ({
               <div
                 ref={(el) => registerPort(node.id, out.id, el)}
                 className="port-noodle"
-                onMouseDown={() => onPortClick(node.id, out.id)}
-              ></div>
+                onMouseDown={() => onOutputPortMouseDown(node.id, out.id)}
+                ></div>
             </div>
           ))}
         </div>
@@ -65,6 +67,7 @@ const Node = ({
                 ref={(el) => registerPort(node.id, inp.id, el)}
                 className="port-noodle"
                 onMouseUp={() => onInputMouseUp(node.id, inp.id)}
+                onMouseDown={() => onInputMouseDown(node.id, inp.id)}
               ></div>
             </div>
           ))}
