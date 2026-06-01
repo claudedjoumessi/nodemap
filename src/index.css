@@ -7,8 +7,8 @@
 
 :root {
   font-size: 18px;
-  font-family: "Space Grotesk";
-  letter-spacing: -0.18px;
+  font-family: "JetBrains Mono";
+  letter-spacing: 0.1px;
   color-scheme: light dark;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -34,7 +34,11 @@
   }
   .node-header {
     padding: 3px var(--node-x-padding);
-    @apply font-medium flex items-center gap-1 bg-emerald-900 rounded-t-md;
+    @apply flex items-center gap-1 bg-emerald-900 rounded-t-md;
+  }
+  .node-name {
+    text-shadow: 0 1px 3px #0007;
+    @apply font-medium;
   }
   .node-body {
     padding: var(--node-x-padding);
