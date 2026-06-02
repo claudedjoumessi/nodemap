@@ -4,6 +4,7 @@ type TNode = {
   position: { x: number; y: number };
   inputs: Port[];
   outputs: Port[];
+  type: "input" | "output" | "add" | "multiply" | "power" | "sine" | "clamp";
 };
 
 type Port = {
