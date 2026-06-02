@@ -7,8 +7,8 @@
 
 :root {
   font-size: 18px;
-  font-family: "Space Grotesk";
-  letter-spacing: 0.18px;
+  font-family: "JetBrains Mono";
+  letter-spacing: 0.1px;
   color-scheme: light dark;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -19,20 +19,30 @@
 
 @layer components {
   .canvas-screen {
-    background-image: radial-gradient(#ffffff11 2px, transparent 1px);
-    background-size: 25px 25px;
+    background-color: #111111;
+    background-image: radial-gradient(#ffffff09 2px, transparent 2px), radial-gradient(#ffffff04 2px, transparent 2px);
+    background-size: 60px 60px, 20px 20px;
     @apply w-screen h-screen;
   }
 
   /* Node */
   .node {
     --node-x-padding: 8px;
-    --noodle-size: 10px;
-    @apply absolute w-40 flex flex-col bg-neutral-800 rounded-lg select-none;
+    --noodle-size: 12px;
+    box-shadow: 0 6px 9px 4px #060606cd;
+    @apply absolute w-40 flex flex-col bg-neutral-800/80 backdrop-blur-xl rounded-md select-none;
   }
   .node-header {
-    padding: 4px var(--node-x-padding);
-    @apply flex items-center gap-1 bg-emerald-900 rounded-t-lg;
+    padding: 3px var(--node-x-padding);
+    @apply flex items-center gap-1 bg-emerald-900 rounded-t-md;
+  }
+  .node-header.io {
+    padding: 3px var(--node-x-padding);
+    @apply flex items-center gap-1 bg-neutral-900 rounded-t-md;
+  }
+  .node-name {
+    text-shadow: 0 1px 3px #0007;
+    @apply font-medium;
   }
   .node-body {
     padding: var(--node-x-padding);
@@ -47,7 +57,7 @@
   .port .port-noodle {
     width: var(--noodle-size);
     height: var(--noodle-size);
-    @apply absolute bg-emerald-600 rounded-full border border-white/40;
+    @apply absolute bg-emerald-600 rounded-full border border-neutral-900;
   }
   .node-outputs {
     @apply items-end;

@@ -3,28 +3,46 @@ import Node from "./Node";
 import type { PendingConnection, Connection, TNode } from "../lib/types";
 import BezierLayer from "./BezierLayer";
 import { nanoid } from "nanoid";
+import { Play } from "lucide-react";
 
 const Canvas = () => {
   const nodesData: TNode[] = [
     {
-      id: "e",
-      name: "Increment",
-      position: { x: 120, y: 240 },
-      inputs: [{ id: "I1", name: "X" }],
-      outputs: [{ id: "O1", name: "Result" }],
+      id: "in",
+      name: "Input",
+      position: { x: 100, y: 120 },
+      inputs: [],
+      outputs: [{ id: "Val", name: "Value" }],
+      type: "input",
     },
     {
-      id: "m",
+      id: "out",
+      name: "Output",
+      position: { x: 880, y: 320 },
+      inputs: [{ id: "Out", name: "Output" }],
+      outputs: [],
+      type: "output",
+    },
+    {
+      id: "a",
       name: "Add",
-      position: { x: 450, y: 500 },
+      position: { x: 100, y: 220 },
       inputs: [
-        { id: "I1", name: "X" },
-        { id: "I2", name: "Y" },
+        { id: "A", name: "A" },
+        { id: "B", name: "B" },
       ],
-      outputs: [{ id: "O1", name: "Result" }],
+      outputs: [{ id: "Out", name: "Sum" }],
+      type: "add",
+    },
+    {
+      id: "s",
+      name: "Sine",
+      position: { x: 100, y: 460 },
+      inputs: [{ id: "Angle", name: "Angle" }],
+      outputs: [{ id: "Out", name: "Sin" }],
+      type: "sine",
     },
   ];
-
   const [nodes, setNodes] = useState(nodesData);
   const [nodeDragging, setNodeDragging] = useState<{
     id: string;
@@ -164,6 +182,49 @@ const Canvas = () => {
     return connections.filter((c) => c !== delConn);
   };
 
+  const getNodeParents = (destNodeId: string) => {
+    const sources = [];
+    const parents = [];
+
+    const parConns = connections.filter((c) => c.targetNodeId === destNodeId);
+
+    for (const pC of parConns) {
+      sources.push(pC.sourceNodeId);
+    }
+
+    for (const source of sources) {
+      const nS = nodes.find((n) => n.id === source);
+      if (!nS) continue;
+      parents.push(nS);
+    }
+
+    return parents;
+  };
+
+  type NodeCallback = (variable: number) => number;
+
+  // Evaluate Pipeline
+  const evaluate = (nodeId: string): NodeCallback => {
+    const node = nodes.find((n) => n.id === nodeId)!;
+    const parents = getNodeParents(nodeId);
+    const inputs = parents.map((p) => evaluate(p.id));
+
+    switch (node.type) {
+      case "input":
+        return (x) => x;
+      case "sine":
+        return (x) => Math.sin(inputs[0]?.(x) ?? x);
+      case "multiply":
+        return (x) => inputs[0](x) * inputs[1](x);
+      case "add":
+        return (x) => (inputs[0]?.(x) ?? 0) + (inputs[1]?.(x) ?? 0);
+      case "output":
+        return (x) => inputs[0]?.(x) ?? 0;
+      default:
+        return (_x) => 0;
+    }
+  };
+
   return (
     <div
       id="canvasScreen"
@@ -187,6 +248,13 @@ const Canvas = () => {
           onInputMouseDown={handleDisconnect}
         />
       ))}
+      <button
+        type="button"
+        onClick={() => console.log(evaluate("out")(30 * (Math.PI / 180)))}
+        className="absolute top-4 right-4 bg-emerald-800 p-2 rounded-xl active:bg-emerald-900 active:scale-95 cursor-pointer"
+      >
+        <Play />
+      </button>
     </div>
   );
 };
