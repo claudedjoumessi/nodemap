@@ -5,27 +5,25 @@ import {
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
 import GraphPlot from "./components/GraphPlot";
-import { useEvaluate } from "./hooks/useEvaluate";
+import { NodeProvider } from "./context/NodeContext";
 
 const App = () => {
-
-  // const { evaluate } = useEvaluate()
-
   return (
-    // <Canvas />
-    <div className="h-screen w-screen p-3">
-      <div className="h-full w-full">
-        <ResizablePanelGroup orientation="horizontal" className="rounded-lg">
-          <ResizablePanel className="pr-1" defaultSize={"60%"} >
-            <Canvas />
-          </ResizablePanel>
-          <ResizableHandle withHandle />
-          <ResizablePanel>
-            <GraphPlot fn={(x) => x * x} />
-          </ResizablePanel>
-        </ResizablePanelGroup>
+    <NodeProvider>
+      <div className="h-screen w-screen p-3">
+        <div className="h-full w-full">
+          <ResizablePanelGroup orientation="horizontal" className="rounded-lg">
+            <ResizablePanel className="pr-1" defaultSize={"55%"}>
+              <Canvas />
+            </ResizablePanel>
+            <ResizableHandle withHandle />
+            <ResizablePanel className="pr-2 pt-1 pl-1">
+              <GraphPlot />
+            </ResizablePanel>
+          </ResizablePanelGroup>
+        </div>
       </div>
-    </div>
+    </NodeProvider>
   );
 };
 

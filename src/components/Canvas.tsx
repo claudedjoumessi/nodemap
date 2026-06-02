@@ -1,58 +1,21 @@
 import React, { useRef, useState } from "react";
 import Node from "./Node";
-import type { PendingConnection, Connection, TNode } from "../lib/types";
+import type { PendingConnection, Connection } from "../lib/types";
 import BezierLayer from "./BezierLayer";
 import { nanoid } from "nanoid";
-import { Play } from "lucide-react";
-import { useEvaluate } from "@/hooks/useEvaluate";
+import { useNodeContext } from "@/context/NodeContext";
 
 const Canvas = () => {
-  const nodesData: TNode[] = [
-    {
-      id: "in",
-      name: "Input",
-      position: { x: 100, y: 120 },
-      inputs: [],
-      outputs: [{ id: "Val", name: "Value" }],
-      type: "input",
-    },
-    {
-      id: "out",
-      name: "Output",
-      position: { x: 680, y: 320 },
-      inputs: [{ id: "Out", name: "Output" }],
-      outputs: [],
-      type: "output",
-    },
-    {
-      id: "a",
-      name: "Add",
-      position: { x: 100, y: 220 },
-      inputs: [
-        { id: "A", name: "A" },
-        { id: "B", name: "B" },
-      ],
-      outputs: [{ id: "Out", name: "Sum" }],
-      type: "add",
-    },
-    {
-      id: "s",
-      name: "Sine",
-      position: { x: 100, y: 460 },
-      inputs: [{ id: "Angle", name: "Angle" }],
-      outputs: [{ id: "Out", name: "Sin" }],
-      type: "sine",
-    },
-  ];
-  const [nodes, setNodes] = useState(nodesData);
   const [nodeDragging, setNodeDragging] = useState<{
     id: string;
     offsetX: number;
     offsetY: number;
   } | null>(null);
-  const [connections, setConnections] = useState<Connection[]>([]);
   const [pendingConnection, setPendingConnection] = useState<PendingConnection | null>(null);
   const [disconnecting, setDisconnecting] = useState<Omit<Connection, "id"> | null>(null);
+
+  // Accessing Nodes & Connections and Setters from Context
+  const { nodes, setNodes, connections, setConnections } = useNodeContext()
 
   // Port Global Registry
   const portRefs = useRef<Record<string, HTMLDivElement>>({});
@@ -187,8 +150,6 @@ const Canvas = () => {
     return connections.filter((c) => c !== delConn);
   };
 
-  const { evaluate } = useEvaluate(nodes, connections)
-
   return (
     <div
       id="canvasScreen"
@@ -213,13 +174,6 @@ const Canvas = () => {
           onInputMouseDown={handleDisconnect}
         />
       ))}
-      <button
-        type="button"
-        onClick={() => console.log(evaluate("out")(30 * (Math.PI / 180)))}
-        className="absolute top-4 right-4 bg-emerald-800 p-2 rounded-xl active:bg-emerald-900 active:scale-95 cursor-pointer"
-      >
-        <Play />
-      </button>
     </div>
   );
 };

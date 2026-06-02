@@ -17,7 +17,6 @@ const BezierLayer = ({ pendingEdge, connections, getPortPos }: BezierLayerProps)
     return Math.abs(x1 - x2) * tension;
   };
 
-
   const getConnectionPoints = (connection: Connection) => {
     const { portX: x1, portY: y1 } = getPortPos(
       connection.sourceNodeId,

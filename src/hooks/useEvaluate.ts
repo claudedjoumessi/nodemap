@@ -37,7 +37,7 @@ export const useEvaluate = (
       case "sine":
         return (x) => Math.sin(inputs[0]?.(x) ?? x);
       case "multiply":
-        return (x) => inputs[0](x) * inputs[1](x);
+        return (x) => inputs[0]?.(x) * inputs[1]?.(x);
       case "add":
         return (x) => (inputs[0]?.(x) ?? 0) + (inputs[1]?.(x) ?? 0);
       case "output":
