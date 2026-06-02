@@ -36,17 +36,32 @@ const GraphPlot = () => {
   };
 
   const options = {
-    animation: false as const,
+    animation: true as const,
     plugins: { legend: { display: false } },
     scales: {
-      x: { display: true, grid: { color: "#fff3" } },
-      y: { grid: { color: "#fff3" }, ticks: { color: "#64748b" } },
+      x: {
+        type: "linear",
+        position: "center",
+        grid: {
+          color: (ctx: any) => (ctx.tick.value === 0 ? "#fff6" : "#fff2"),
+          lineWidth: (ctx: any) => (ctx.tick.value === 0 ? 2 : 1),
+        },
+      },
+      y: {
+        type: "linear",
+        position: "center",
+        grid: {
+          color: (ctx: any) => (ctx.tick.value === 0 ? "#fff6" : "#fff2"),
+          lineWidth: (ctx: any) => (ctx.tick.value === 0 ? 2 : 1),
+        },
+        grace: "5%",
+      },
     },
   };
 
   return (
     <div className="relative w-full h-full">
-      <Line data={data} options={{ ...options, maintainAspectRatio: false }} />
+      <Line data={data} options={{ ...options, maintainAspectRatio: false } as any} />
     </div>
   );
 };
