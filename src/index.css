@@ -139,7 +139,7 @@
     background-color: #111111;
     background-image: radial-gradient(#ffffff09 2px, transparent 2px), radial-gradient(#ffffff04 2px, transparent 2px);
     background-size: 60px 60px, 20px 20px;
-    @apply font-mono w-screen h-screen;
+    @apply relative rounded-md font-mono w-full h-full;
   }
 
   /* Node */

@@ -18,7 +18,7 @@ const Canvas = () => {
     {
       id: "out",
       name: "Output",
-      position: { x: 880, y: 320 },
+      position: { x: 680, y: 320 },
       inputs: [{ id: "Out", name: "Output" }],
       outputs: [],
       type: "output",
@@ -55,6 +55,7 @@ const Canvas = () => {
 
   // Port Global Registry
   const portRefs = useRef<Record<string, HTMLDivElement>>({});
+  const canvasRef = useRef<HTMLDivElement|null>(null)
 
   const registerPort = (nodeId: string, portId: string, el: HTMLDivElement | null) => {
     if (el) portRefs.current[`${nodeId}.${portId}`] = el;
@@ -64,9 +65,12 @@ const Canvas = () => {
     const portEl = portRefs.current[`${nodeId}.${portId}`];
     const portRect = portEl.getBoundingClientRect();
 
+    // if(!canvasRef.current) return
+    const canvasRect = (canvasRef.current as HTMLDivElement).getBoundingClientRect()
+
     return {
-      portX: portRect.left + portRect.width / 2,
-      portY: portRect.top + portRect.height / 2,
+      portX: (portRect.left + portRect.width / 2) - canvasRect.left,
+      portY: (portRect.top + portRect.height / 2) - canvasRect.top,
     };
   };
 
@@ -228,6 +232,7 @@ const Canvas = () => {
   return (
     <div
       id="canvasScreen"
+      ref={canvasRef}
       className="canvas-screen"
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
@@ -235,7 +240,7 @@ const Canvas = () => {
       <BezierLayer
         pendingEdge={pendingConnection}
         connections={connections}
-        portRefs={portRefs}
+        getPortPos={getPortPos}
       />
       {nodes.map((n) => (
         <Node
