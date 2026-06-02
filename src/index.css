@@ -36,6 +36,10 @@
     padding: 3px var(--node-x-padding);
     @apply flex items-center gap-1 bg-emerald-900 rounded-t-md;
   }
+  .node-header.io {
+    padding: 3px var(--node-x-padding);
+    @apply flex items-center gap-1 bg-neutral-900 rounded-t-md;
+  }
   .node-name {
     text-shadow: 0 1px 3px #0007;
     @apply font-medium;
