@@ -4,6 +4,7 @@ import type { PendingConnection, Connection, TNode } from "../lib/types";
 import BezierLayer from "./BezierLayer";
 import { nanoid } from "nanoid";
 import { Play } from "lucide-react";
+import { useEvaluate } from "@/hooks/useEvaluate";
 
 const Canvas = () => {
   const nodesData: TNode[] = [
@@ -186,48 +187,7 @@ const Canvas = () => {
     return connections.filter((c) => c !== delConn);
   };
 
-  const getNodeParents = (destNodeId: string) => {
-    const sources = [];
-    const parents = [];
-
-    const parConns = connections.filter((c) => c.targetNodeId === destNodeId);
-
-    for (const pC of parConns) {
-      sources.push(pC.sourceNodeId);
-    }
-
-    for (const source of sources) {
-      const nS = nodes.find((n) => n.id === source);
-      if (!nS) continue;
-      parents.push(nS);
-    }
-
-    return parents;
-  };
-
-  type NodeCallback = (variable: number) => number;
-
-  // Evaluate Pipeline
-  const evaluate = (nodeId: string): NodeCallback => {
-    const node = nodes.find((n) => n.id === nodeId)!;
-    const parents = getNodeParents(nodeId);
-    const inputs = parents.map((p) => evaluate(p.id));
-
-    switch (node.type) {
-      case "input":
-        return (x) => x;
-      case "sine":
-        return (x) => Math.sin(inputs[0]?.(x) ?? x);
-      case "multiply":
-        return (x) => inputs[0](x) * inputs[1](x);
-      case "add":
-        return (x) => (inputs[0]?.(x) ?? 0) + (inputs[1]?.(x) ?? 0);
-      case "output":
-        return (x) => inputs[0]?.(x) ?? 0;
-      default:
-        return (_x) => 0;
-    }
-  };
+  const { evaluate } = useEvaluate(nodes, connections)
 
   return (
     <div
