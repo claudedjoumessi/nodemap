@@ -1,60 +1,25 @@
 import React, { useRef, useState } from "react";
 import Node from "./Node";
-import type { PendingConnection, Connection, TNode } from "../lib/types";
+import type { PendingConnection, Connection } from "../lib/types";
 import BezierLayer from "./BezierLayer";
 import { nanoid } from "nanoid";
-import { Play } from "lucide-react";
+import { useNodeContext } from "@/context/NodeContext";
 
 const Canvas = () => {
-  const nodesData: TNode[] = [
-    {
-      id: "in",
-      name: "Input",
-      position: { x: 100, y: 120 },
-      inputs: [],
-      outputs: [{ id: "Val", name: "Value" }],
-      type: "input",
-    },
-    {
-      id: "out",
-      name: "Output",
-      position: { x: 880, y: 320 },
-      inputs: [{ id: "Out", name: "Output" }],
-      outputs: [],
-      type: "output",
-    },
-    {
-      id: "a",
-      name: "Add",
-      position: { x: 100, y: 220 },
-      inputs: [
-        { id: "A", name: "A" },
-        { id: "B", name: "B" },
-      ],
-      outputs: [{ id: "Out", name: "Sum" }],
-      type: "add",
-    },
-    {
-      id: "s",
-      name: "Sine",
-      position: { x: 100, y: 460 },
-      inputs: [{ id: "Angle", name: "Angle" }],
-      outputs: [{ id: "Out", name: "Sin" }],
-      type: "sine",
-    },
-  ];
-  const [nodes, setNodes] = useState(nodesData);
   const [nodeDragging, setNodeDragging] = useState<{
     id: string;
     offsetX: number;
     offsetY: number;
   } | null>(null);
-  const [connections, setConnections] = useState<Connection[]>([]);
   const [pendingConnection, setPendingConnection] = useState<PendingConnection | null>(null);
   const [disconnecting, setDisconnecting] = useState<Omit<Connection, "id"> | null>(null);
 
+  // Accessing Nodes & Connections and Setters from Context
+  const { nodes, setNodes, connections, setConnections } = useNodeContext()
+
   // Port Global Registry
   const portRefs = useRef<Record<string, HTMLDivElement>>({});
+  const canvasRef = useRef<HTMLDivElement|null>(null)
 
   const registerPort = (nodeId: string, portId: string, el: HTMLDivElement | null) => {
     if (el) portRefs.current[`${nodeId}.${portId}`] = el;
@@ -64,9 +29,12 @@ const Canvas = () => {
     const portEl = portRefs.current[`${nodeId}.${portId}`];
     const portRect = portEl.getBoundingClientRect();
 
+    // if(!canvasRef.current) return
+    const canvasRect = (canvasRef.current as HTMLDivElement).getBoundingClientRect()
+
     return {
-      portX: portRect.left + portRect.width / 2,
-      portY: portRect.top + portRect.height / 2,
+      portX: (portRect.left + portRect.width / 2) - canvasRect.left,
+      portY: (portRect.top + portRect.height / 2) - canvasRect.top,
     };
   };
 
@@ -182,52 +150,10 @@ const Canvas = () => {
     return connections.filter((c) => c !== delConn);
   };
 
-  const getNodeParents = (destNodeId: string) => {
-    const sources = [];
-    const parents = [];
-
-    const parConns = connections.filter((c) => c.targetNodeId === destNodeId);
-
-    for (const pC of parConns) {
-      sources.push(pC.sourceNodeId);
-    }
-
-    for (const source of sources) {
-      const nS = nodes.find((n) => n.id === source);
-      if (!nS) continue;
-      parents.push(nS);
-    }
-
-    return parents;
-  };
-
-  type NodeCallback = (variable: number) => number;
-
-  // Evaluate Pipeline
-  const evaluate = (nodeId: string): NodeCallback => {
-    const node = nodes.find((n) => n.id === nodeId)!;
-    const parents = getNodeParents(nodeId);
-    const inputs = parents.map((p) => evaluate(p.id));
-
-    switch (node.type) {
-      case "input":
-        return (x) => x;
-      case "sine":
-        return (x) => Math.sin(inputs[0]?.(x) ?? x);
-      case "multiply":
-        return (x) => inputs[0](x) * inputs[1](x);
-      case "add":
-        return (x) => (inputs[0]?.(x) ?? 0) + (inputs[1]?.(x) ?? 0);
-      case "output":
-        return (x) => inputs[0]?.(x) ?? 0;
-      default:
-        return (_x) => 0;
-    }
-  };
-
   return (
     <div
       id="canvasScreen"
+      ref={canvasRef}
       className="canvas-screen"
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
@@ -235,7 +161,7 @@ const Canvas = () => {
       <BezierLayer
         pendingEdge={pendingConnection}
         connections={connections}
-        portRefs={portRefs}
+        getPortPos={getPortPos}
       />
       {nodes.map((n) => (
         <Node
@@ -248,13 +174,6 @@ const Canvas = () => {
           onInputMouseDown={handleDisconnect}
         />
       ))}
-      <button
-        type="button"
-        onClick={() => console.log(evaluate("out")(30 * (Math.PI / 180)))}
-        className="absolute top-4 right-4 bg-emerald-800 p-2 rounded-xl active:bg-emerald-900 active:scale-95 cursor-pointer"
-      >
-        <Play />
-      </button>
     </div>
   );
 };
