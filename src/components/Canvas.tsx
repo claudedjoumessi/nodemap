@@ -1,9 +1,11 @@
 import React, { useRef, useState } from "react";
 import Node from "./Node";
-import type { PendingConnection, Connection } from "../lib/types";
+import type { PendingConnection, Connection, TNode } from "@/lib/types";
 import BezierLayer from "./BezierLayer";
 import { nanoid } from "nanoid";
 import { useNodeContext } from "@/context/NodeContext";
+import { registerDefinition } from "@/lib/NodeRegistry";
+import { Plus } from "lucide-react";
 
 const Canvas = () => {
   const [nodeDragging, setNodeDragging] = useState<{
@@ -15,11 +17,11 @@ const Canvas = () => {
   const [disconnecting, setDisconnecting] = useState<Omit<Connection, "id"> | null>(null);
 
   // Accessing Nodes & Connections and Setters from Context
-  const { nodes, setNodes, connections, setConnections } = useNodeContext()
+  const { nodes, setNodes, connections, setConnections } = useNodeContext();
 
   // Port Global Registry
   const portRefs = useRef<Record<string, HTMLDivElement>>({});
-  const canvasRef = useRef<HTMLDivElement|null>(null)
+  const canvasRef = useRef<HTMLDivElement | null>(null);
 
   const registerPort = (nodeId: string, portId: string, el: HTMLDivElement | null) => {
     if (el) portRefs.current[`${nodeId}.${portId}`] = el;
@@ -30,11 +32,11 @@ const Canvas = () => {
     const portRect = portEl.getBoundingClientRect();
 
     // if(!canvasRef.current) return
-    const canvasRect = (canvasRef.current as HTMLDivElement).getBoundingClientRect()
+    const canvasRect = (canvasRef.current as HTMLDivElement).getBoundingClientRect();
 
     return {
-      portX: (portRect.left + portRect.width / 2) - canvasRect.left,
-      portY: (portRect.top + portRect.height / 2) - canvasRect.top,
+      portX: portRect.left + portRect.width / 2 - canvasRect.left,
+      portY: portRect.top + portRect.height / 2 - canvasRect.top,
     };
   };
 
@@ -150,6 +152,30 @@ const Canvas = () => {
     return connections.filter((c) => c !== delConn);
   };
 
+  const handleAdd = () => {
+    // console.log("Adding Node")
+    const sineDef = registerDefinition({
+      type: "sine",
+      name: "Sine",
+      inputs: ['Angle'],
+      outputs: ['Value'],
+      compute(inputs) {
+        return (x) => Math.cos(inputs[0]?.(x) ?? 0)
+      },
+    })
+
+    const newNode: TNode = {
+      id: sineDef.type + nanoid(5),
+      name: sineDef.name,
+      inputs: [{id: "I1", name: sineDef.inputs[0]}],
+      outputs: [{id: "O1", name: sineDef.outputs[0]}],
+      position: { x: 0, y: 0 },
+      compute(inputs) { return sineDef.compute(inputs) }
+    }
+
+    setNodes(prev => [...prev, newNode])
+  }
+
   return (
     <div
       id="canvasScreen"
@@ -174,6 +200,9 @@ const Canvas = () => {
           onInputMouseDown={handleDisconnect}
         />
       ))}
+      <button className="absolute top-4 right-4 size-8 rounded-lg flex items-center justify-center bg-emerald-700" onClick={handleAdd}>
+        <Plus />
+      </button>
     </div>
   );
 };
