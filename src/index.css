@@ -147,15 +147,17 @@
     --node-x-padding: 8px;
     --noodle-size: 12px;
     box-shadow: 0 6px 9px 4px #060606cd;
-    @apply absolute w-40 flex flex-col bg-neutral-800/80 backdrop-blur-xl rounded-md select-none;
+    @apply absolute min-w-40 flex flex-col bg-neutral-800/80 backdrop-blur-xl rounded-md select-none;
+  }
+  .node.active {
+    @apply outline outline-foreground z-50;
   }
   .node-header {
     padding: 3px var(--node-x-padding);
-    @apply flex items-center gap-1 bg-emerald-900 rounded-t-md;
+    @apply flex items-center gap-1 bg-emerald-900/90 rounded-t-md;
   }
   .node-header.io {
-    padding: 3px var(--node-x-padding);
-    @apply flex items-center gap-1 bg-neutral-900 rounded-t-md;
+    @apply bg-neutral-900;
   }
   .node-name {
     text-shadow: 0 1px 3px #0007;

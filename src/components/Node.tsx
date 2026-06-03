@@ -1,10 +1,13 @@
 import { ChevronDown } from "lucide-react";
 import type { TNode } from "../lib/types";
 import type React from "react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
-type NodeProps = {
+export type NodeProps = {
   node: TNode;
+  ref?: React.RefObject<HTMLDivElement | null>;
+  active?: boolean;
+  onClick?: (e: React.MouseEvent) => void;
   registerPort: (nodeId: string, portId: string, el: HTMLDivElement | null) => void;
   onDragStart: (nodeId: string, e: React.MouseEvent) => void;
   onOutputPortMouseDown: (nodeId: string, portId: string) => void;
@@ -14,6 +17,9 @@ type NodeProps = {
 
 const Node = ({
   node,
+  ref,
+  active,
+  onClick,
   registerPort,
   onDragStart,
   onOutputPortMouseDown,
@@ -26,9 +32,15 @@ const Node = ({
     setGrabbing(true);
     onDragStart(node.id, e);
   };
+  
 
   return (
-    <div className="node" style={{ top: node.position.y, left: node.position.x }}>
+    <div
+      ref={ref}
+      className={`node ${active && "active"}`}
+      style={{ top: node.position.y, left: node.position.x }}
+      onClick={(e) => { e.stopPropagation(); onClick?.(e) }}
+    >
       <div
         className={`node-header ${(node.type === "input" || node.type === "output") && "io"} 
                     ${grabbing ? "cursor-grabbing" : "cursor-grab"}
