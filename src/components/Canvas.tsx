@@ -4,8 +4,8 @@ import type { PendingConnection, Connection, TNode } from "@/lib/types";
 import BezierLayer from "./BezierLayer";
 import { nanoid } from "nanoid";
 import { useNodeContext } from "@/context/NodeContext";
-import NodeFinder from "./NodeFinder";
 import type { NodeDefinition } from "@/lib/NodeRegistry";
+import { CanvasContextualLayer } from "./CanvasContextualLayer";
 
 const Canvas = () => {
   const [nodeDragging, setNodeDragging] = useState<{
@@ -152,7 +152,7 @@ const Canvas = () => {
     return connections.filter((c) => c !== delConn);
   };
 
-  const handleAdd = (def: NodeDefinition) => {
+  const handleNodeAdd = (def: NodeDefinition) => {
     const newNode: TNode = {
       id: def.type + nanoid(5),
       name: def.name,
@@ -167,7 +167,6 @@ const Canvas = () => {
         return def.compute(inputs);
       },
     };
-
     setNodes((prev) => [...prev, newNode]);
   };
 
@@ -184,6 +183,7 @@ const Canvas = () => {
         connections={connections}
         getPortPos={getPortPos}
       />
+      <CanvasContextualLayer onDefSelect={handleNodeAdd} />
       {nodes.map((n) => (
         <Node
           key={n.id}
@@ -195,7 +195,6 @@ const Canvas = () => {
           onInputMouseDown={handleDisconnect}
         />
       ))}
-      <NodeFinder onSelect={(s) => handleAdd(s)} />
     </div>
   );
 };
