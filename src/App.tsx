@@ -17,7 +17,7 @@ const App = () => {
               <Canvas />
             </ResizablePanel>
             <ResizableHandle withHandle />
-            <ResizablePanel>
+            <ResizablePanel className="pl-1">
               <GraphPlot />
             </ResizablePanel>
           </ResizablePanelGroup>

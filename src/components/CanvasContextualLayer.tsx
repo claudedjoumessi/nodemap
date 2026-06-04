@@ -27,9 +27,9 @@ export const CanvasContextualLayer = ({
             <ContextMenuItem
               key={def.type}
               onSelect={() => onDefSelect(def)}
-              className="focus:bg-neutral-600/20"
+              className="focus:bg-neutral-600/20 font-normal text-neutral-400 focus:text-neutral-100 focus:font-semibold"
             >
-              <p className="font-medium">{def.name}</p>
+              <p>{def.name}</p>
             </ContextMenuItem>
           ))}
         </div>
