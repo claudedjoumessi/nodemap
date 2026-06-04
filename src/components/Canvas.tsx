@@ -1,9 +1,11 @@
 import React, { useRef, useState } from "react";
 import Node from "./Node";
-import type { PendingConnection, Connection } from "../lib/types";
+import type { PendingConnection, Connection, TNode } from "@/lib/types";
 import BezierLayer from "./BezierLayer";
 import { nanoid } from "nanoid";
 import { useNodeContext } from "@/context/NodeContext";
+import type { NodeDefinition } from "@/lib/NodeRegistry";
+import { CanvasContextualLayer } from "./CanvasContextualLayer";
 
 const Canvas = () => {
   const [nodeDragging, setNodeDragging] = useState<{
@@ -15,11 +17,11 @@ const Canvas = () => {
   const [disconnecting, setDisconnecting] = useState<Omit<Connection, "id"> | null>(null);
 
   // Accessing Nodes & Connections and Setters from Context
-  const { nodes, setNodes, connections, setConnections } = useNodeContext()
+  const { nodes, setNodes, connections, setConnections } = useNodeContext();
 
   // Port Global Registry
   const portRefs = useRef<Record<string, HTMLDivElement>>({});
-  const canvasRef = useRef<HTMLDivElement|null>(null)
+  const canvasRef = useRef<HTMLDivElement | null>(null);
 
   const registerPort = (nodeId: string, portId: string, el: HTMLDivElement | null) => {
     if (el) portRefs.current[`${nodeId}.${portId}`] = el;
@@ -30,11 +32,11 @@ const Canvas = () => {
     const portRect = portEl.getBoundingClientRect();
 
     // if(!canvasRef.current) return
-    const canvasRect = (canvasRef.current as HTMLDivElement).getBoundingClientRect()
+    const canvasRect = (canvasRef.current as HTMLDivElement).getBoundingClientRect();
 
     return {
-      portX: (portRect.left + portRect.width / 2) - canvasRect.left,
-      portY: (portRect.top + portRect.height / 2) - canvasRect.top,
+      portX: portRect.left + portRect.width / 2 - canvasRect.left,
+      portY: portRect.top + portRect.height / 2 - canvasRect.top,
     };
   };
 
@@ -150,6 +152,24 @@ const Canvas = () => {
     return connections.filter((c) => c !== delConn);
   };
 
+  const handleNodeAdd = (def: NodeDefinition) => {
+    const newNode: TNode = {
+      id: def.type + nanoid(5),
+      name: def.name,
+      inputs: def.inputs.map((inp) => {
+        return { id: `I${inp}`, name: inp };
+      }),
+      outputs: def.outputs.map((out) => {
+        return { id: `I${out}`, name: out };
+      }),
+      position: { x: 0, y: 0 },
+      compute(inputs) {
+        return def.compute(inputs);
+      },
+    };
+    setNodes((prev) => [...prev, newNode]);
+  };
+
   return (
     <div
       id="canvasScreen"
@@ -163,6 +183,7 @@ const Canvas = () => {
         connections={connections}
         getPortPos={getPortPos}
       />
+      <CanvasContextualLayer onDefSelect={handleNodeAdd} />
       {nodes.map((n) => (
         <Node
           key={n.id}

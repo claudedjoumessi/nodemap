@@ -1,10 +1,12 @@
+import type { NodeCallback } from "./NodeRegistry";
+
 type TNode = {
   id: string;
   name: string;
   position: { x: number; y: number };
   inputs: Port[];
   outputs: Port[];
-  type: "input" | "output" | "add" | "multiply" | "power" | "sine" | "clamp";
+  compute: (inputs: NodeCallback[]) => NodeCallback;
 };
 
 type Port = {
