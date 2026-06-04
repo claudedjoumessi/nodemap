@@ -6,7 +6,7 @@ import {
 } from "@/components/ui/context-menu";
 
 import type { NodeDefinition } from "@/lib/NodeRegistry";
-import * as Definitions from "@/lib/NodeSchemas";
+import * as Definitions from "@/lib/NodeSchemas.test";
 
 type CanvasContextualLayerProps = {
   onDefSelect: (def: NodeDefinition) => void;

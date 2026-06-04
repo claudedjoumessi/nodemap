@@ -14,6 +14,7 @@ const NodeProvider = ({ children }: { children: ReactNode }) => {
   const starterNodes: TNode[] = [
     {
       id: "in",
+      category: "input",
       name: "Input",
       inputs: [],
       outputs: [{ id: "I1", name: "Input" }],
@@ -24,6 +25,7 @@ const NodeProvider = ({ children }: { children: ReactNode }) => {
     },
     {
       id: "out",
+      category: "output",
       name: "Output",
       inputs: [{ id: "O1", name: "Output" }],
       outputs: [],

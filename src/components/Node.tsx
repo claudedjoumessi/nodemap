@@ -1,12 +1,11 @@
 import { ChevronDown } from "lucide-react";
 import type { TNode } from "../lib/types";
 import type React from "react";
-import { useRef, useState } from "react";
+import { useState } from "react";
+import ValueInput from "./node/ValueInput";
 
 export type NodeProps = {
   node: TNode;
-  ref?: React.RefObject<HTMLDivElement | null>;
-  active?: boolean;
   onClick?: (e: React.MouseEvent) => void;
   registerPort: (nodeId: string, portId: string, el: HTMLDivElement | null) => void;
   onDragStart: (nodeId: string, e: React.MouseEvent) => void;
@@ -17,8 +16,6 @@ export type NodeProps = {
 
 const Node = ({
   node,
-  ref,
-  active,
   onClick,
   registerPort,
   onDragStart,
@@ -32,17 +29,18 @@ const Node = ({
     setGrabbing(true);
     onDragStart(node.id, e);
   };
-  
 
   return (
     <div
-      ref={ref}
-      className={`node ${active && "active"}`}
+      className="node"
       style={{ top: node.position.y, left: node.position.x }}
-      onClick={(e) => { e.stopPropagation(); onClick?.(e) }}
+      onClick={(e) => {
+        e.stopPropagation();
+        onClick?.(e);
+      }}
     >
       <div
-        className={`node-header ${(node.type === "input" || node.type === "output") && "io"} 
+        className={`node-header ${(node.category === "input" || node.category === "output") && " bg-neutral-900"} 
                     ${grabbing ? "cursor-grabbing" : "cursor-grab"}
                   `}
         onMouseDown={(e) => handleHeaderMouseDown(e)}
@@ -69,7 +67,12 @@ const Node = ({
         <div className="node-ports node-inputs">
           {node.inputs.map((inp) => (
             <div className="port" key={inp.id}>
-              <div className="port-name">{inp.name}</div>
+              {(inp.defaultValue !== undefined) ? (
+                <ValueInput inp={inp} />
+              ) : (
+                <div>{inp.name}</div>
+              )}
+
               <div
                 ref={(el) => registerPort(node.id, inp.id, el)}
                 className="port-noodle"

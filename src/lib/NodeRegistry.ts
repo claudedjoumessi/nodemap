@@ -1,12 +1,13 @@
 import type { Port } from "./types";
 
 export type NodeCallback = (variable: number) => number;
+export type InputField = { name: string; defaultValue?: number }
 
 export type NodeDefinition = {
   type: string;
   name: string;
-  inputs: Port["name"][]; // <- Just an array of label inputs
-  outputs: Port["name"][]; // <- Just an array of label outputs
+  inputs: InputField[]; // <- Now an array of dynamic inputs
+  outputs: Port['name'][]; // <- Now an array of dynamic outputs
   compute: (inputs: NodeCallback[]) => NodeCallback;
 };
 

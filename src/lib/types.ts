@@ -2,6 +2,7 @@ import type { NodeCallback } from "./NodeRegistry";
 
 type TNode = {
   id: string;
+  category?: string;
   name: string;
   position: { x: number; y: number };
   inputs: Port[];
@@ -12,6 +13,7 @@ type TNode = {
 type Port = {
   id: string;
   name: string;
+  defaultValue?: number;
 };
 
 type Connection = {

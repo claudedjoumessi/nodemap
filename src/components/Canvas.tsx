@@ -156,8 +156,8 @@ const Canvas = () => {
     const newNode: TNode = {
       id: def.type + nanoid(5),
       name: def.name,
-      inputs: def.inputs.map((inp) => {
-        return { id: `I${inp}`, name: inp };
+      inputs: def.inputs.map((inf, i) => {
+        return { id: `I${i + 1}`, name: inf.name, defaultValue: inf.defaultValue };
       }),
       outputs: def.outputs.map((out) => {
         return { id: `I${out}`, name: out };
