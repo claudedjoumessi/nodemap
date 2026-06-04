@@ -1,73 +1,61 @@
-# React + TypeScript + Vite
+# nodemap (v0.1)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Interactive node-based graph editor built with React, TypeScript and Vite.
 
-Currently, two official plugins are available:
+## Overview
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+`nodemap` is a canvas-based editor for creating and visualizing node graphs. It provides a pluggable node registry, rendering layers (Bezier connections, graph plots), and contextual UI for adding nodes.
 
-## React Compiler
+## Features
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- Canvas with resizable panels and contextual menu for adding a node
+- Bezier connection rendering between nodes
+- Node registry and schema-driven node types
+- React + TypeScript + Vite development setup
+- Real-Time Grpah powered by [chart.js](https://www.chartjs.org/)
 
-## Expanding the ESLint configuration
+## Quickstart
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+First clone the repository into your local machine with:
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+git clone https://github.com/claudedjoumessi/nodemap.git
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Install dependencies and start the dev server:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
+npm run dev
 ```
+
+Build for production:
+
+```bash
+npm run build
+npm run preview
+```
+
+## Project Structure
+
+- `src/` — application source
+	- `App.tsx` — app shell and routing
+	- `main.tsx` — app entry
+	- `components/` — canvas and UI components
+		- `Canvas.tsx`, `BezierLayer.tsx`, `GraphPlot.tsx`, `Node.tsx`
+	- `context/` — React contexts (e.g. `NodeContext.tsx`)
+	- `hooks/` — reusable hooks (e.g. `useEvaluate.ts`)
+	- `lib/` — node registry, schemas, utilities and types
+
+See the source for implementation details.
+
+## Scripts
+
+Key npm scripts (from `package.json`):
+
+- `npm run dev` — start Vite dev server
+- `npm run build` — typecheck and build for production
+- `npm run preview` — preview production build
+
+---
+Made with 🔥 by claudio.dev
