@@ -3,7 +3,7 @@ import type { Connection, PendingConnection } from "../lib/types";
 type BezierLayerProps = {
   pendingEdge: PendingConnection | null;
   connections: Connection[];
-  portRefs: React.RefObject<Record<string, HTMLDivElement>>;
+  getPortPos: (nodeId: string, portId: string) => { portX: number; portY: number };
 };
 
 // Formula
@@ -12,19 +12,9 @@ type BezierLayerProps = {
 // (x2, y2) = (x3 - offset, y3)
 // offset = clamp(|x3 - x0| * 0.5, minOff, maxOff)
 
-const BezierLayer = ({ portRefs, pendingEdge, connections }: BezierLayerProps) => {
+const BezierLayer = ({ pendingEdge, connections, getPortPos }: BezierLayerProps) => {
   const offset = (x1: number, x2: number, tension: number = 0.35) => {
     return Math.abs(x1 - x2) * tension;
-  };
-
-  const getPortPos = (nodeId: string, portId: string) => {
-    const portEl = portRefs.current[`${nodeId}.${portId}`];
-    const portRect = portEl.getBoundingClientRect();
-
-    return {
-      portX: portRect.left + portRect.width / 2,
-      portY: portRect.top + portRect.height / 2,
-    };
   };
 
   const getConnectionPoints = (connection: Connection) => {
@@ -48,7 +38,10 @@ const BezierLayer = ({ portRefs, pendingEdge, connections }: BezierLayerProps) =
     >
       {pendingEdge &&
         (() => {
-          const { portX, portY } = getPortPos(pendingEdge.sourceNodeId, pendingEdge.sourcePortId)
+          const { portX, portY } = getPortPos(
+            pendingEdge.sourceNodeId,
+            pendingEdge.sourcePortId,
+          );
           return (
             <path
               d={`M ${portX} ${portY} 
