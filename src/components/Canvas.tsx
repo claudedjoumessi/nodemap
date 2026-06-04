@@ -4,8 +4,8 @@ import type { PendingConnection, Connection, TNode } from "@/lib/types";
 import BezierLayer from "./BezierLayer";
 import { nanoid } from "nanoid";
 import { useNodeContext } from "@/context/NodeContext";
-import { registerDefinition } from "@/lib/NodeRegistry";
-import { Plus } from "lucide-react";
+import NodeFinder from "./NodeFinder";
+import type { NodeDefinition } from "@/lib/NodeRegistry";
 
 const Canvas = () => {
   const [nodeDragging, setNodeDragging] = useState<{
@@ -152,29 +152,24 @@ const Canvas = () => {
     return connections.filter((c) => c !== delConn);
   };
 
-  const handleAdd = () => {
-    // console.log("Adding Node")
-    const sineDef = registerDefinition({
-      type: "sine",
-      name: "Sine",
-      inputs: ['Angle'],
-      outputs: ['Value'],
-      compute(inputs) {
-        return (x) => Math.cos(inputs[0]?.(x) ?? 0)
-      },
-    })
-
+  const handleAdd = (def: NodeDefinition) => {
     const newNode: TNode = {
-      id: sineDef.type + nanoid(5),
-      name: sineDef.name,
-      inputs: [{id: "I1", name: sineDef.inputs[0]}],
-      outputs: [{id: "O1", name: sineDef.outputs[0]}],
+      id: def.type + nanoid(5),
+      name: def.name,
+      inputs: def.inputs.map((inp) => {
+        return { id: `I${inp}`, name: inp };
+      }),
+      outputs: def.outputs.map((out) => {
+        return { id: `I${out}`, name: out };
+      }),
       position: { x: 0, y: 0 },
-      compute(inputs) { return sineDef.compute(inputs) }
-    }
+      compute(inputs) {
+        return def.compute(inputs);
+      },
+    };
 
-    setNodes(prev => [...prev, newNode])
-  }
+    setNodes((prev) => [...prev, newNode]);
+  };
 
   return (
     <div
@@ -200,9 +195,7 @@ const Canvas = () => {
           onInputMouseDown={handleDisconnect}
         />
       ))}
-      <button className="absolute top-4 right-4 size-8 rounded-lg flex items-center justify-center bg-emerald-700" onClick={handleAdd}>
-        <Plus />
-      </button>
+      <NodeFinder onSelect={(s) => handleAdd(s)} />
     </div>
   );
 };
