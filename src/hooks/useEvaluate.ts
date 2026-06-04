@@ -22,30 +22,15 @@ const getNodeParents = (destNodeId: string, nodes: TNode[], connections: Connect
 };
 
 // Evaluate Pipeline
-export const useEvaluate = (
-  nodes: TNode[],
-  connections: Connection[],
-) => {
+export const useEvaluate = (nodes: TNode[], connections: Connection[]) => {
   const evaluate = (nodeId: string): NodeCallback => {
-    const node = nodes.find((n) => n.id === nodeId)!;
+    const node = nodes.find((n) => n.id === nodeId);
+    if (!node) throw new Error("Couldn't read node at id: " + nodeId);
     const parents = getNodeParents(nodeId, nodes, connections);
     const inputs = parents.map((p) => evaluate(p.id));
 
-    switch (node.type) {
-      case "input":
-        return (x) => x;
-      case "sine":
-        return (x) => Math.sin(inputs[0]?.(x) ?? x);
-      case "multiply":
-        return (x) => inputs[0]?.(x) * inputs[1]?.(x);
-      case "add":
-        return (x) => (inputs[0]?.(x) ?? 0) + (inputs[1]?.(x) ?? 0);
-      case "output":
-        return (x) => inputs[0]?.(x) ?? 0;
-      default:
-        return (_x) => 0;
-    }
+    return node.compute(inputs);
   };
 
-  return { evaluate }
+  return { evaluate };
 };

@@ -1,9 +1,11 @@
 import React, { useRef, useState } from "react";
-import Node, { type NodeProps } from "./Node";
-import type { PendingConnection, Connection, TNode } from "../lib/types";
+import Node from "./Node";
+import type { PendingConnection, Connection, TNode } from "@/lib/types";
 import BezierLayer from "./BezierLayer";
 import { nanoid } from "nanoid";
 import { useNodeContext } from "@/context/NodeContext";
+import type { NodeDefinition } from "@/lib/NodeRegistry";
+import { CanvasContextualLayer } from "./CanvasContextualLayer";
 
 const Canvas = () => {
   const [nodeDragging, setNodeDragging] = useState<{
@@ -14,15 +16,12 @@ const Canvas = () => {
   const [pendingConnection, setPendingConnection] = useState<PendingConnection | null>(null);
   const [disconnecting, setDisconnecting] = useState<Omit<Connection, "id"> | null>(null);
 
-  const [activeNode, setActiveNode] = useState<TNode["id"] | null>(null);
-
   // Accessing Nodes & Connections and Setters from Context
   const { nodes, setNodes, connections, setConnections } = useNodeContext();
 
   // Port Global Registry
   const portRefs = useRef<Record<string, HTMLDivElement>>({});
   const canvasRef = useRef<HTMLDivElement | null>(null);
-  const nodeRef = useRef<HTMLDivElement | null>(null);
 
   const registerPort = (nodeId: string, portId: string, el: HTMLDivElement | null) => {
     if (el) portRefs.current[`${nodeId}.${portId}`] = el;
@@ -153,9 +152,22 @@ const Canvas = () => {
     return connections.filter((c) => c !== delConn);
   };
 
-  const handleCanvasClick = () => {
-    // Deselecting Node
-    setActiveNode(null);
+  const handleNodeAdd = (def: NodeDefinition) => {
+    const newNode: TNode = {
+      id: def.type + nanoid(5),
+      name: def.name,
+      inputs: def.inputs.map((inp) => {
+        return { id: `I${inp}`, name: inp };
+      }),
+      outputs: def.outputs.map((out) => {
+        return { id: `I${out}`, name: out };
+      }),
+      position: { x: 0, y: 0 },
+      compute(inputs) {
+        return def.compute(inputs);
+      },
+    };
+    setNodes((prev) => [...prev, newNode]);
   };
 
   return (
@@ -165,20 +177,17 @@ const Canvas = () => {
       className="canvas-screen"
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
-      onClick={handleCanvasClick}
     >
       <BezierLayer
         pendingEdge={pendingConnection}
         connections={connections}
         getPortPos={getPortPos}
       />
+      <CanvasContextualLayer onDefSelect={handleNodeAdd} />
       {nodes.map((n) => (
         <Node
-          ref={nodeRef}
           key={n.id}
           node={n}
-          active={n.id === activeNode}
-          onClick={() => setActiveNode(n.id)}
           registerPort={registerPort}
           onDragStart={onDragStart}
           onOutputPortMouseDown={handlePendingConnection}
