@@ -31,20 +31,32 @@ const Canvas = () => {
     const portEl = portRefs.current[`${nodeId}.${portId}`];
     const portRect = portEl.getBoundingClientRect();
 
-    // if(!canvasRef.current) return
-    const canvasRect = (canvasRef.current as HTMLDivElement).getBoundingClientRect();
+    const { x, y } = worldToLocal({
+      x: portRect.left + portRect.width / 2,
+      y: portRect.top + portRect.height / 2,
+    });
 
     return {
-      portX: portRect.left + portRect.width / 2 - canvasRect.left,
-      portY: portRect.top + portRect.height / 2 - canvasRect.top,
+      portX: x,
+      portY: y,
+    };
+  };
+
+  // Apply correction to node position for connections
+  const worldToLocal = ({ x, y }: { x: number; y: number }) => {
+    const canvasRect = (canvasRef.current as HTMLDivElement).getBoundingClientRect();
+    return {
+      x: x - canvasRect.left,
+      y: y - canvasRect.top,
     };
   };
 
   // Node Dragging Logic
   const handleMouseUp = () => {
     setNodeDragging(null);
-    setPendingConnection(null);
     setDisconnecting(null);
+    setPendingConnection(null);
+    (canvasRef.current as HTMLDivElement).style.cursor = "default"
   };
 
   const handleMouseMove = (e: React.MouseEvent) => {
@@ -54,6 +66,7 @@ const Canvas = () => {
         currentX: e.clientX,
         currentY: e.clientY,
       });
+      (canvasRef.current as HTMLDivElement).style.cursor = "crosshair"
     }
     if (disconnecting) {
       setPendingConnection({
@@ -182,6 +195,7 @@ const Canvas = () => {
         pendingEdge={pendingConnection}
         connections={connections}
         getPortPos={getPortPos}
+        worldToLocal={worldToLocal}
       />
       <CanvasContextualLayer onDefSelect={handleNodeAdd} />
       {nodes.map((n) => (
