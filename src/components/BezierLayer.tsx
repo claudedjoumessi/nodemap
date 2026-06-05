@@ -4,6 +4,7 @@ type BezierLayerProps = {
   pendingEdge: PendingConnection | null;
   connections: Connection[];
   getPortPos: (nodeId: string, portId: string) => { portX: number; portY: number };
+  worldToLocal: ({ x, y }: { x: number; y: number; }) => { x: number; y: number; }
 };
 
 // Formula
@@ -12,7 +13,7 @@ type BezierLayerProps = {
 // (x2, y2) = (x3 - offset, y3)
 // offset = clamp(|x3 - x0| * 0.5, minOff, maxOff)
 
-const BezierLayer = ({ pendingEdge, connections, getPortPos }: BezierLayerProps) => {
+const BezierLayer = ({ pendingEdge, connections, getPortPos, worldToLocal }: BezierLayerProps) => {
   const offset = (x1: number, x2: number, tension: number = 0.35) => {
     return Math.abs(x1 - x2) * tension;
   };
@@ -42,12 +43,13 @@ const BezierLayer = ({ pendingEdge, connections, getPortPos }: BezierLayerProps)
             pendingEdge.sourceNodeId,
             pendingEdge.sourcePortId,
           );
+          const mousePos = worldToLocal({ x: pendingEdge.currentX, y: pendingEdge.currentY })
           return (
             <path
               d={`M ${portX} ${portY} 
-              C ${portX + offset(pendingEdge.currentX, portX)} ${portY},
-                ${pendingEdge.currentX - offset(pendingEdge.currentX, portX)} ${pendingEdge.currentY},
-                ${pendingEdge.currentX} ${pendingEdge.currentY}`}
+              C ${portX + offset(mousePos.x, portX)} ${portY},
+                ${mousePos.x - offset(mousePos.x, portX)} ${mousePos.y},
+                ${mousePos.x} ${mousePos.y}`}
               fill="none"
               className="stroke-white/90"
               strokeWidth={3}
