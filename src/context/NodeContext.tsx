@@ -1,5 +1,5 @@
 import type { Connection, TNode } from "@/lib/types";
-import React, { createContext, useContext, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 
 interface INodeContext {
   connections: Connection[];
@@ -11,46 +11,46 @@ interface INodeContext {
 const NodeContext = createContext<INodeContext | null>(null);
 
 const NodeProvider = ({ children }: { children: ReactNode }) => {
-  const nodesData: TNode[] = [
+  const starterNodes: TNode[] = [
     {
       id: "in",
       name: "Input",
-      position: { x: 100, y: 120 },
       inputs: [],
-      outputs: [{ id: "Val", name: "Value" }],
-      type: "input",
+      outputs: [{ id: "I1", name: "Input" }],
+      position: { x: 100, y: 300 },
+      compute() {
+        return (x) => x;
+      },
     },
     {
       id: "out",
       name: "Output",
-      position: { x: 480, y: 320 },
-      inputs: [{ id: "Out", name: "Output" }],
+      inputs: [{ id: "O1", name: "Output" }],
       outputs: [],
-      type: "output",
-    },
-    {
-      id: "a",
-      name: "Add",
-      position: { x: 100, y: 220 },
-      inputs: [
-        { id: "A", name: "A" },
-        { id: "B", name: "B" },
-      ],
-      outputs: [{ id: "Out", name: "Sum" }],
-      type: "add",
-    },
-    {
-      id: "s",
-      name: "Sine",
-      position: { x: 100, y: 460 },
-      inputs: [{ id: "Angle", name: "Angle" }],
-      outputs: [{ id: "Out", name: "Sin" }],
-      type: "sine",
+      position: { x: 500, y: 300 },
+      compute(inputs) {
+        return (x) => inputs[0]?.(x) ?? 0;
+      },
     },
   ];
 
-  const [nodes, setNodes] = React.useState(nodesData);
-  const [connections, setConnections] = React.useState<Connection[]>([]);
+  // Setting nodes before DOM first render
+  const [nodes, setNodes] = useState<TNode[]>(starterNodes);
+  const [connections, setConnections] = useState<Connection[]>([]);
+
+  // Setting connections after DOM first render
+  useEffect(() => {
+    const starterConnections: Connection[] = [
+      {
+        id: "in.I1_out.O1",
+        sourceNodeId: "in",
+        sourcePortId: "I1",
+        targetNodeId: "out",
+        targetPortId: "O1",
+      },
+    ];
+    setConnections(starterConnections);
+  }, []);
 
   const contextValue = { nodes, setNodes, connections, setConnections };
 
