@@ -56,7 +56,7 @@ const Canvas = () => {
     setNodeDragging(null);
     setDisconnecting(null);
     setPendingConnection(null);
-    (canvasRef.current as HTMLDivElement).style.cursor = "default"
+    (canvasRef.current as HTMLDivElement).style.cursor = "default";
   };
 
   const handleMouseMove = (e: React.MouseEvent) => {
@@ -66,7 +66,7 @@ const Canvas = () => {
         currentX: e.clientX,
         currentY: e.clientY,
       });
-      (canvasRef.current as HTMLDivElement).style.cursor = "crosshair"
+      (canvasRef.current as HTMLDivElement).style.cursor = "crosshair";
     }
     if (disconnecting) {
       setPendingConnection({
@@ -125,18 +125,20 @@ const Canvas = () => {
   const handleConnection = (nodeId: string, portId: string) => {
     if (!pendingConnection) return;
     if (nodeId === pendingConnection.sourceNodeId) return;
-    if (checkConnection(nodeId, portId)) return;
+    const newConn = {
+      id: `${nanoid()}`,
+      sourceNodeId: pendingConnection.sourceNodeId,
+      sourcePortId: pendingConnection.sourcePortId,
+      targetNodeId: nodeId,
+      targetPortId: portId,
+    };
 
-    setConnections((prev) => [
-      ...prev,
-      {
-        id: `${nanoid()}`,
-        sourceNodeId: pendingConnection.sourceNodeId,
-        sourcePortId: pendingConnection.sourcePortId,
-        targetNodeId: nodeId,
-        targetPortId: portId,
-      },
-    ]);
+    setConnections((prev) => {
+      // Filter by removing the connection linked to
+      // the input port we want to connect to.
+      const otherConns = prev.filter((c) => c !== checkConnection(nodeId, portId));
+      return [...otherConns, newConn];
+    });
   };
 
   const handleDisconnect = (nodeId: string, portId: string) => {
