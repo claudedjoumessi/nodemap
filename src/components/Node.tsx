@@ -1,7 +1,7 @@
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
 import type { TNode } from "../lib/types";
 import type React from "react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useNodeContext } from "@/context/NodeContext";
 
 export type NodeProps = {
@@ -24,6 +24,7 @@ const Node = ({
   const [grabbing, setGrabbing] = useState(false);
 
   const { updateNodeData } = useNodeContext();
+  const inputRef = useRef<HTMLInputElement | null>(null);
 
   const handleHeaderMouseDown = (e: React.MouseEvent) => {
     setGrabbing(true);
@@ -60,14 +61,46 @@ const Node = ({
             ))}
           </div>
         )}
-        {node.data?.value != undefined && (
-          <input
-            type="number"
-            className="border focus-within:outline-none"
-            defaultValue={node.data.value ?? 0}
-            onChange={(e) => updateNodeData(node.id, { value: parseInt(e.target.value ?? 0) })}
-          />
-        )}
+        {node.data?.value !== undefined &&
+          (() => {
+            const updateInput = (value: string) => {
+              updateNodeData(node.id, { value: parseFloat(value ?? 0) });
+            };
+
+            return (
+              <div className="value-input flex bg-neutral-700 rounded-md">
+                <button
+                  className="rounded-l-md hover:bg-neutral-600"
+                  type="button"
+                  onClick={() => {
+                    inputRef.current?.stepDown();
+                    updateInput((inputRef.current as HTMLInputElement).value);
+                  }}
+                >
+                  <ChevronLeft />
+                </button>
+                <input
+                  ref={inputRef}
+                  type="number"
+                  className="outline-none w-full px-1.5 text-center"
+                  value={node.data.value}
+                  onChange={(e) => {
+                    updateInput(isNaN(parseFloat(e.target.value)) ? "0" : e.target.value);
+                  }}
+                />
+                <button
+                  className="rounded-r-md hover:bg-neutral-600"
+                  type="button"
+                  onClick={() => {
+                    inputRef.current?.stepUp();
+                    updateInput((inputRef.current as HTMLInputElement).value);
+                  }}
+                >
+                  <ChevronRight />
+                </button>
+              </div>
+            );
+          })()}
         {/* Input Ports */}
         {node.inputs.length !== 0 && (
           <div className="node-ports node-inputs">
