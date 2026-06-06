@@ -2,18 +2,18 @@ import type { NodeCallback } from "./NodeRegistry";
 
 type TNode = {
   id: string;
-  category?: string;
+  category: "io" | "value" | "default";
   name: string;
   position: { x: number; y: number };
   inputs: Port[];
   outputs: Port[];
-  compute: (inputs: NodeCallback[]) => NodeCallback;
+  data?: Record<string, number>;
+  compute: (parameters: NodeCallback[]) => NodeCallback;
 };
 
 type Port = {
   id: string;
   name: string;
-  defaultValue?: number;
 };
 
 type Connection = {

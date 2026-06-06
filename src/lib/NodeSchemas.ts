@@ -1,8 +1,19 @@
 import { registerDefinition } from "./NodeRegistry";
 
+export const value = registerDefinition({
+  type: "value",
+  name: "Value",
+  inputs: [],
+  outputs: ["Value"],
+  data: { value: 3 },
+  compute() {
+    return () => this.data?.value ?? 0;
+  },
+});
+
 // Trigonometric
 export const sine = registerDefinition({
-  type: "sine",
+  type: "default",
   name: "Sine",
   inputs: ["Angle"],
   outputs: ["Sine"],
@@ -12,7 +23,7 @@ export const sine = registerDefinition({
 });
 
 export const cosine = registerDefinition({
-  type: "cosine",
+  type: "default",
   name: "Cosine",
   inputs: ["Angle"],
   outputs: ["Cosine"],
@@ -22,7 +33,7 @@ export const cosine = registerDefinition({
 });
 
 export const tangent = registerDefinition({
-  type: "tangent",
+  type: "default",
   name: "Tangent",
   inputs: ["Angle"],
   outputs: ["Tangent"],
@@ -33,17 +44,18 @@ export const tangent = registerDefinition({
 
 // Inverse trigonometry
 export const arcsine = registerDefinition({
-  type: "arcsine",
+  type: "default",
   name: "ArcSine",
   inputs: ["Value"],
   outputs: ["Angle"],
   compute(inputs) {
-    return (x) => Math.asin(Math.max(-1, Math.min(1, inputs[0]?.(x) ?? 0)));
+    // return (x) => Math.asin(Math.max(-1, Math.min(1, inputs[0]?.(x) ?? 0)));
+    return (x) => Math.asin(inputs[0]?.(x) ?? 0);
   },
 });
 
 export const arccosine = registerDefinition({
-  type: "arccosine",
+  type: "default",
   name: "ArcCosine",
   inputs: ["Value"],
   outputs: ["Angle"],
@@ -53,7 +65,7 @@ export const arccosine = registerDefinition({
 });
 
 export const arctangent = registerDefinition({
-  type: "arctangent",
+  type: "default",
   name: "ArcTangent",
   inputs: ["Value"],
   outputs: ["Angle"],
@@ -64,7 +76,7 @@ export const arctangent = registerDefinition({
 
 // Unit conversions
 export const degreesToRadians = registerDefinition({
-  type: "deg2rad",
+  type: "default",
   name: "DegToRad",
   inputs: ["Degrees"],
   outputs: ["Radians"],
@@ -74,7 +86,7 @@ export const degreesToRadians = registerDefinition({
 });
 
 export const radiansToDegrees = registerDefinition({
-  type: "rad2deg",
+  type: "default",
   name: "RadToDeg",
   inputs: ["Radians"],
   outputs: ["Degrees"],
@@ -85,7 +97,7 @@ export const radiansToDegrees = registerDefinition({
 
 // Arithmetic
 export const add = registerDefinition({
-  type: "add",
+  type: "default",
   name: "Add",
   inputs: ["Value 1", "Value 2"],
   outputs: ["Result"],
@@ -95,7 +107,7 @@ export const add = registerDefinition({
 });
 
 export const multiply = registerDefinition({
-  type: "multiply",
+  type: "default",
   name: "Multiply",
   inputs: ["Value 1", "Value 2"],
   outputs: ["Result"],
@@ -105,7 +117,7 @@ export const multiply = registerDefinition({
 });
 
 export const subtract = registerDefinition({
-  type: "subtract",
+  type: "default",
   name: "Subtract",
   inputs: ["Minuend", "Subtrahend"],
   outputs: ["Result"],
@@ -115,7 +127,7 @@ export const subtract = registerDefinition({
 });
 
 export const divide = registerDefinition({
-  type: "divide",
+  type: "default",
   name: "Divide",
   inputs: ["Dividend", "Divisor"],
   outputs: ["Quotient"],
@@ -130,7 +142,7 @@ export const divide = registerDefinition({
 });
 
 export const power = registerDefinition({
-  type: "power",
+  type: "default",
   name: "Power",
   inputs: ["Base", "Exponent"],
   outputs: ["Result"],
@@ -141,7 +153,7 @@ export const power = registerDefinition({
 
 // Root / magnitude
 export const sqrt = registerDefinition({
-  type: "sqrt",
+  type: "default",
   name: "Square Root",
   inputs: ["Value"],
   outputs: ["Root"],
@@ -151,7 +163,7 @@ export const sqrt = registerDefinition({
 });
 
 export const abs = registerDefinition({
-  type: "absolute",
+  type: "default",
   name: "Absolute",
   inputs: ["Value"],
   outputs: ["Absolute"],
@@ -162,7 +174,7 @@ export const abs = registerDefinition({
 
 // Rounding
 export const floor = registerDefinition({
-  type: "floor",
+  type: "default",
   name: "Floor",
   inputs: ["Value"],
   outputs: ["Result"],
@@ -172,7 +184,7 @@ export const floor = registerDefinition({
 });
 
 export const ceil = registerDefinition({
-  type: "ceil",
+  type: "default",
   name: "Ceiling",
   inputs: ["Value"],
   outputs: ["Result"],
@@ -183,7 +195,7 @@ export const ceil = registerDefinition({
 
 // Clamp / min / max
 export const clamp = registerDefinition({
-  type: "clamp",
+  type: "default",
   name: "Clamp",
   inputs: ["Value", "Min", "Max"],
   outputs: ["Clamped"],
@@ -201,7 +213,7 @@ export const clamp = registerDefinition({
 });
 
 export const minimum = registerDefinition({
-  type: "minimum",
+  type: "default",
   name: "Minimum",
   inputs: ["Value A", "Value B"],
   outputs: ["Min"],
@@ -211,7 +223,7 @@ export const minimum = registerDefinition({
 });
 
 export const maximum = registerDefinition({
-  type: "maximum",
+  type: "default",
   name: "Maximum",
   inputs: ["Value A", "Value B"],
   outputs: ["Max"],
@@ -222,7 +234,7 @@ export const maximum = registerDefinition({
 
 // Modular & reciprocals
 export const modulo = registerDefinition({
-  type: "modulo",
+  type: "default",
   name: "Modulo",
   inputs: ["Dividend", "Divisor"],
   outputs: ["Remainder"],
@@ -237,7 +249,7 @@ export const modulo = registerDefinition({
 });
 
 export const reciprocal = registerDefinition({
-  type: "reciprocal",
+  type: "default",
   name: "Reciprocal",
   inputs: ["Value"],
   outputs: ["Reciprocal"],
@@ -250,7 +262,7 @@ export const reciprocal = registerDefinition({
 });
 
 export const sign = registerDefinition({
-  type: "sign",
+  type: "default",
   name: "Sign",
   inputs: ["Value"],
   outputs: ["Sign"],
@@ -261,7 +273,7 @@ export const sign = registerDefinition({
 
 // Exponentials & logs
 export const naturalLog = registerDefinition({
-  type: "ln",
+  type: "default",
   name: "Natural Log",
   inputs: ["Value"],
   outputs: ["Log"],
@@ -271,7 +283,7 @@ export const naturalLog = registerDefinition({
 });
 
 export const logBase = registerDefinition({
-  type: "log",
+  type: "default",
   name: "Logarithm",
   inputs: ["Value", "Base"],
   outputs: ["Log"],
@@ -286,7 +298,7 @@ export const logBase = registerDefinition({
 });
 
 export const exponential = registerDefinition({
-  type: "exp",
+  type: "default",
   name: "Exponential",
   inputs: ["Exponent"],
   outputs: ["Result"],

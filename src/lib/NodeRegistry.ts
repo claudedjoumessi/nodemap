@@ -1,27 +1,19 @@
-import type { Port } from "./types";
+import type { Port, TNode } from "./types";
 
 export type NodeCallback = (variable: number) => number;
-export type InputField = { name: string; defaultValue?: number }
 
 export type NodeDefinition = {
-  type: string;
+  type: TNode['category'];
   name: string;
-  inputs: InputField[]; // <- Now an array of dynamic inputs
-  outputs: Port['name'][]; // <- Now an array of dynamic outputs
-  compute: (inputs: NodeCallback[]) => NodeCallback;
+  inputs: Port['name'][];
+  outputs: Port['name'][];
+  data?: Record<string, number>;
+  compute: (parameters: NodeCallback[]) => NodeCallback;
 };
 
-const registry: Record<NodeDefinition["type"], NodeDefinition> = {};
-
-export const getDefinition = (type: NodeDefinition["type"]) => {
-  return registry[type];
-};
+const registry: Record<NodeDefinition["name"], NodeDefinition> = {};
 
 export const registerDefinition = (def: NodeDefinition) => {
-  try {
-    registry[def.type] = def;
-  } catch (e) {
-    throw new Error("Couldn't register definition to registry.");
-  }
+  registry[def.name] = def;
   return def;
 };

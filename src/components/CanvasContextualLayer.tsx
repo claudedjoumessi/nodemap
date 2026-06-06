@@ -6,7 +6,7 @@ import {
 } from "@/components/ui/context-menu";
 
 import type { NodeDefinition } from "@/lib/NodeRegistry";
-import * as Definitions from "@/lib/NodeSchemas.test";
+import * as Definitions from "@/lib/NodeSchemas";
 
 type CanvasContextualLayerProps = {
   onDefSelect: (def: NodeDefinition) => void;
@@ -25,9 +25,9 @@ export const CanvasContextualLayer = ({
         <div className="node-finder_inner">
           {definitions.map((def) => (
             <ContextMenuItem
-              key={def.type}
+              key={def.name}
               onSelect={() => onDefSelect(def)}
-              className="focus:bg-neutral-600/20 font-normal text-neutral-400 focus:text-neutral-100 focus:font-semibold"
+              className="focus:bg-neutral-600/20 text-lg font-normal text-neutral-400 focus:text-neutral-100 focus:font-semibold"
             >
               <p>{def.name}</p>
             </ContextMenuItem>

@@ -155,17 +155,17 @@ const Canvas = () => {
   const handleNodeAdd = (def: NodeDefinition) => {
     const newNode: TNode = {
       id: def.type + nanoid(5),
+      category: def.type,
       name: def.name,
-      inputs: def.inputs.map((inf, i) => {
-        return { id: `I${i + 1}`, name: inf.name, defaultValue: inf.defaultValue };
+      inputs: def.inputs.map((inp) => {
+        return { id: `I${inp}`, name: inp };
       }),
       outputs: def.outputs.map((out) => {
         return { id: `I${out}`, name: out };
       }),
-      position: { x: 0, y: 0 },
-      compute(inputs) {
-        return def.compute(inputs);
-      },
+      data: def.data,
+      position: { x: 20, y: 20 },
+      compute: def.compute,
     };
     setNodes((prev) => [...prev, newNode]);
   };

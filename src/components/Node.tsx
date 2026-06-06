@@ -2,11 +2,10 @@ import { ChevronDown } from "lucide-react";
 import type { TNode } from "../lib/types";
 import type React from "react";
 import { useState } from "react";
-import ValueInput from "./node/ValueInput";
+import { useNodeContext } from "@/context/NodeContext";
 
 export type NodeProps = {
   node: TNode;
-  onClick?: (e: React.MouseEvent) => void;
   registerPort: (nodeId: string, portId: string, el: HTMLDivElement | null) => void;
   onDragStart: (nodeId: string, e: React.MouseEvent) => void;
   onOutputPortMouseDown: (nodeId: string, portId: string) => void;
@@ -16,7 +15,6 @@ export type NodeProps = {
 
 const Node = ({
   node,
-  onClick,
   registerPort,
   onDragStart,
   onOutputPortMouseDown,
@@ -25,22 +23,19 @@ const Node = ({
 }: NodeProps) => {
   const [grabbing, setGrabbing] = useState(false);
 
+  const { updateNodeData } = useNodeContext();
+
   const handleHeaderMouseDown = (e: React.MouseEvent) => {
     setGrabbing(true);
     onDragStart(node.id, e);
   };
 
   return (
-    <div
-      className="node"
-      style={{ top: node.position.y, left: node.position.x }}
-      onClick={(e) => {
-        e.stopPropagation();
-        onClick?.(e);
-      }}
-    >
+    <div className="node" style={{ top: node.position.y, left: node.position.x }}>
       <div
-        className={`node-header ${(node.category === "input" || node.category === "output") && " bg-neutral-900"} 
+        className={`node-header ${node.category === "io" && " bg-neutral-900"}
+                    ${node.category === "value" && " bg-pink-900"}
+                    ${node.category === "default" && " bg-emerald-900"}
                     ${grabbing ? "cursor-grabbing" : "cursor-grab"}
                   `}
         onMouseDown={(e) => handleHeaderMouseDown(e)}
@@ -63,16 +58,21 @@ const Node = ({
             </div>
           ))}
         </div>
+        {node.data?.value != undefined && (
+          <input
+            type="number"
+            className="border"
+            defaultValue={node.data.value ?? 0}
+            onChange={(e) =>
+              updateNodeData(node.id, { value: parseInt(e.target.value ?? 0) })
+            }
+          />
+        )}
         {/* Input Ports */}
         <div className="node-ports node-inputs">
           {node.inputs.map((inp) => (
             <div className="port" key={inp.id}>
-              {(inp.defaultValue !== undefined) ? (
-                <ValueInput inp={inp} />
-              ) : (
-                <div>{inp.name}</div>
-              )}
-
+              <div className="port-name">{inp.name}</div>
               <div
                 ref={(el) => registerPort(node.id, inp.id, el)}
                 className="port-noodle"
