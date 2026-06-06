@@ -46,42 +46,44 @@ const Node = ({
       </div>
       <div className="node-body">
         {/* Ouput Ports */}
-        <div className="node-ports node-outputs">
-          {node.outputs.map((out) => (
-            <div className="port" key={out.id}>
-              <div className="port-name">{out.name}</div>
-              <div
-                ref={(el) => registerPort(node.id, out.id, el)}
-                className="port-noodle"
-                onMouseDown={() => onOutputPortMouseDown(node.id, out.id)}
-              ></div>
-            </div>
-          ))}
-        </div>
+        {node.outputs.length !== 0 && (
+          <div className="node-ports node-outputs">
+            {node.outputs.map((out) => (
+              <div className="port" key={out.id}>
+                <div className="port-name">{out.name}</div>
+                <div
+                  ref={(el) => registerPort(node.id, out.id, el)}
+                  className="port-noodle"
+                  onMouseDown={() => onOutputPortMouseDown(node.id, out.id)}
+                ></div>
+              </div>
+            ))}
+          </div>
+        )}
         {node.data?.value != undefined && (
           <input
             type="number"
-            className="border"
+            className="border focus-within:outline-none"
             defaultValue={node.data.value ?? 0}
-            onChange={(e) =>
-              updateNodeData(node.id, { value: parseInt(e.target.value ?? 0) })
-            }
+            onChange={(e) => updateNodeData(node.id, { value: parseInt(e.target.value ?? 0) })}
           />
         )}
         {/* Input Ports */}
-        <div className="node-ports node-inputs">
-          {node.inputs.map((inp) => (
-            <div className="port" key={inp.id}>
-              <div className="port-name">{inp.name}</div>
-              <div
-                ref={(el) => registerPort(node.id, inp.id, el)}
-                className="port-noodle"
-                onMouseUp={() => onInputMouseUp(node.id, inp.id)}
-                onMouseDown={() => onInputMouseDown(node.id, inp.id)}
-              ></div>
-            </div>
-          ))}
-        </div>
+        {node.inputs.length !== 0 && (
+          <div className="node-ports node-inputs">
+            {node.inputs.map((inp) => (
+              <div className="port" key={inp.id}>
+                <div className="port-name">{inp.name}</div>
+                <div
+                  ref={(el) => registerPort(node.id, inp.id, el)}
+                  className="port-noodle"
+                  onMouseUp={() => onInputMouseUp(node.id, inp.id)}
+                  onMouseDown={() => onInputMouseDown(node.id, inp.id)}
+                ></div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
