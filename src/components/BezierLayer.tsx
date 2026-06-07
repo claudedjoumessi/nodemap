@@ -13,7 +13,7 @@ type BezierLayerProps = {
 // offset = clamp(|x3 - x0| * 0.5, minOff, maxOff)
 
 const BezierLayer = ({ pendingEdge, connections, getPortPos }: BezierLayerProps) => {
-  const offset = (x1: number, x2: number, tension: number = 0.35) => {
+  const offset = (x1: number, x2: number, tension: number = 0.3) => {
     return Math.abs(x1 - x2) * tension;
   };
 

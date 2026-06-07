@@ -196,11 +196,11 @@
     box-shadow: 0 6px 9px 4px #060606cd;
   }
   .node-finder_inner {
-    @apply min-w-65 max-h-75 p-1 flex flex-col gap-1 overflow-x-hidden scroll-smooth;
+    @apply min-w-65 max-h-80 p-1 flex flex-col gap-1 overflow-x-hidden scroll-smooth;
     scroll-snap-type: mandatory;
   }
   .node-finder_inner::-webkit-scrollbar {
-    @apply bg-transparent w-2;
+    @apply bg-transparent w-1.5;
   }
   .node-finder_inner::-webkit-scrollbar-thumb {
     @apply bg-neutral-700/60 rounded-full;

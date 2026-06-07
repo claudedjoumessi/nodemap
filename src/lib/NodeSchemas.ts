@@ -5,7 +5,7 @@ export const value = registerDefinition({
   name: "Value",
   inputs: [],
   outputs: ["Value"],
-  data: { value: 3 },
+  data: { value: 1 },
   compute() {
     return () => this.data?.value ?? 0;
   },
@@ -17,6 +17,7 @@ export const sine = registerDefinition({
   name: "Sine",
   inputs: ["Angle"],
   outputs: ["Sine"],
+  expression: "sin(x)",
   compute(inputs) {
     return (x) => Math.sin(inputs[0]?.(x) ?? 0);
   },
@@ -27,6 +28,7 @@ export const cosine = registerDefinition({
   name: "Cosine",
   inputs: ["Angle"],
   outputs: ["Cosine"],
+  expression: "cos(x)",
   compute(inputs) {
     return (x) => Math.cos(inputs[0]?.(x) ?? 0);
   },
@@ -37,6 +39,7 @@ export const tangent = registerDefinition({
   name: "Tangent",
   inputs: ["Angle"],
   outputs: ["Tangent"],
+  expression: "tan(x)",
   compute(inputs) {
     return (x) => Math.tan(inputs[0]?.(x) ?? 0);
   },
@@ -48,6 +51,7 @@ export const arcsine = registerDefinition({
   name: "ArcSine",
   inputs: ["Value"],
   outputs: ["Angle"],
+  expression: "asin(x)",
   compute(inputs) {
     // return (x) => Math.asin(Math.max(-1, Math.min(1, inputs[0]?.(x) ?? 0)));
     return (x) => Math.asin(inputs[0]?.(x) ?? 0);
@@ -59,6 +63,7 @@ export const arccosine = registerDefinition({
   name: "ArcCosine",
   inputs: ["Value"],
   outputs: ["Angle"],
+  expression: "acos(x)",
   compute(inputs) {
     return (x) => Math.acos(Math.max(-1, Math.min(1, inputs[0]?.(x) ?? 0)));
   },
@@ -69,6 +74,7 @@ export const arctangent = registerDefinition({
   name: "ArcTangent",
   inputs: ["Value"],
   outputs: ["Angle"],
+  expression: "atan(x)",
   compute(inputs) {
     return (x) => Math.atan(inputs[0]?.(x) ?? 0);
   },
@@ -80,6 +86,7 @@ export const degreesToRadians = registerDefinition({
   name: "DegToRad",
   inputs: ["Degrees"],
   outputs: ["Radians"],
+  expression: "(x * π) / 180°",
   compute(inputs) {
     return (x) => ((inputs[0]?.(x) ?? 0) * Math.PI) / 180;
   },
@@ -90,6 +97,7 @@ export const radiansToDegrees = registerDefinition({
   name: "RadToDeg",
   inputs: ["Radians"],
   outputs: ["Degrees"],
+  expression: "(x * 180°) / π",
   compute(inputs) {
     return (x) => ((inputs[0]?.(x) ?? 0) * 180) / Math.PI;
   },
@@ -101,6 +109,7 @@ export const add = registerDefinition({
   name: "Add",
   inputs: ["Value 1", "Value 2"],
   outputs: ["Result"],
+  expression: "x + y",
   compute(inputs) {
     return (x) => (inputs[0]?.(x) ?? 0) + (inputs[1]?.(x) ?? 0);
   },
@@ -111,6 +120,7 @@ export const multiply = registerDefinition({
   name: "Multiply",
   inputs: ["Value 1", "Value 2"],
   outputs: ["Result"],
+  expression: "x * y",
   compute(inputs) {
     return (x) => (inputs[0]?.(x) ?? 0) * (inputs[1]?.(x) ?? 0);
   },
@@ -121,6 +131,7 @@ export const subtract = registerDefinition({
   name: "Subtract",
   inputs: ["Minuend", "Subtrahend"],
   outputs: ["Result"],
+  expression: "x - y",
   compute(inputs) {
     return (x) => (inputs[0]?.(x) ?? 0) - (inputs[1]?.(x) ?? 0);
   },
@@ -131,6 +142,7 @@ export const divide = registerDefinition({
   name: "Divide",
   inputs: ["Dividend", "Divisor"],
   outputs: ["Quotient"],
+  expression: "x / y",
   compute(inputs) {
     return (x) => {
       const a = inputs[0]?.(x) ?? 0;
@@ -146,6 +158,7 @@ export const power = registerDefinition({
   name: "Power",
   inputs: ["Base", "Exponent"],
   outputs: ["Result"],
+  expression: "x ^ y",
   compute(inputs) {
     return (x) => Math.pow(inputs[0]?.(x) ?? 0, inputs[1]?.(x) ?? 2);
   },
@@ -157,6 +170,7 @@ export const sqrt = registerDefinition({
   name: "Square Root",
   inputs: ["Value"],
   outputs: ["Root"],
+  expression: "sqrt(x)",
   compute(inputs) {
     return (x) => Math.sqrt(Math.max(0, inputs[0]?.(x) ?? 0));
   },
@@ -167,6 +181,7 @@ export const abs = registerDefinition({
   name: "Absolute",
   inputs: ["Value"],
   outputs: ["Absolute"],
+  expression: "abs(x)",
   compute(inputs) {
     return (x) => Math.abs(inputs[0]?.(x) ?? 0);
   },
@@ -178,6 +193,7 @@ export const floor = registerDefinition({
   name: "Floor",
   inputs: ["Value"],
   outputs: ["Result"],
+  expression: "floor(x)",
   compute(inputs) {
     return (x) => Math.floor(inputs[0]?.(x) ?? 0);
   },
@@ -188,6 +204,7 @@ export const ceil = registerDefinition({
   name: "Ceiling",
   inputs: ["Value"],
   outputs: ["Result"],
+  expression: "ceil(x)",
   compute(inputs) {
     return (x) => Math.ceil(inputs[0]?.(x) ?? 0);
   },
@@ -199,6 +216,7 @@ export const clamp = registerDefinition({
   name: "Clamp",
   inputs: ["Value", "Min", "Max"],
   outputs: ["Clamped"],
+  expression: "clamp(x, min, max)",
   compute(inputs) {
     return (x) => {
       const v = inputs[0]?.(x) ?? 0;
@@ -217,6 +235,7 @@ export const minimum = registerDefinition({
   name: "Minimum",
   inputs: ["Value A", "Value B"],
   outputs: ["Min"],
+  expression: "min(x, y)",
   compute(inputs) {
     return (x) => Math.min(inputs[0]?.(x) ?? 0, inputs[1]?.(x) ?? 0);
   },
@@ -227,6 +246,7 @@ export const maximum = registerDefinition({
   name: "Maximum",
   inputs: ["Value A", "Value B"],
   outputs: ["Max"],
+  expression: "max(x, y)",
   compute(inputs) {
     return (x) => Math.max(inputs[0]?.(x) ?? 0, inputs[1]?.(x) ?? 0);
   },
@@ -238,6 +258,7 @@ export const modulo = registerDefinition({
   name: "Modulo",
   inputs: ["Dividend", "Divisor"],
   outputs: ["Remainder"],
+  expression: "x mod (y)",
   compute(inputs) {
     return (x) => {
       const a = inputs[0]?.(x) ?? 0;
@@ -253,6 +274,7 @@ export const reciprocal = registerDefinition({
   name: "Reciprocal",
   inputs: ["Value"],
   outputs: ["Reciprocal"],
+  expression: "1 / x",
   compute(inputs) {
     return (x) => {
       const v = inputs[0]?.(x) ?? 0;
@@ -266,6 +288,7 @@ export const sign = registerDefinition({
   name: "Sign",
   inputs: ["Value"],
   outputs: ["Sign"],
+  expression: "sign(x)",
   compute(inputs) {
     return (x) => Math.sign(inputs[0]?.(x) ?? 0);
   },
@@ -277,6 +300,7 @@ export const naturalLog = registerDefinition({
   name: "Natural Log",
   inputs: ["Value"],
   outputs: ["Log"],
+  expression: "ln(x)",
   compute(inputs) {
     return (x) => Math.log(inputs[0]?.(x) ?? 1);
   },
@@ -287,6 +311,7 @@ export const logBase = registerDefinition({
   name: "Logarithm",
   inputs: ["Value", "Base"],
   outputs: ["Log"],
+  expression: "log_b(x)",
   compute(inputs) {
     return (x) => {
       const v = inputs[0]?.(x) ?? 1;
@@ -302,6 +327,7 @@ export const exponential = registerDefinition({
   name: "Exponential",
   inputs: ["Exponent"],
   outputs: ["Result"],
+  expression: "exp(x)",
   compute(inputs) {
     return (x) => Math.exp(inputs[0]?.(x) ?? 0);
   },

@@ -8,6 +8,7 @@ export type NodeDefinition = {
   inputs: Port['name'][];
   outputs: Port['name'][];
   data?: Record<string, number>;
+  expression?: string;
   compute: (parameters: NodeCallback[]) => NodeCallback;
 };
 
