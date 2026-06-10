@@ -130,47 +130,45 @@
     @apply bg-background text-foreground;
   }
   html {
-    @apply font-sans;
+    @apply font-sans text-lg;
+  }
+  button {
+    @apply border-none outline-none bg-none appearance-none;
   }
 }
 
 @layer components {
   .canvas-screen {
-    background-color: #111111;
+    /* background-color: #111111; */
     background-image:
       radial-gradient(#ffffff09 2px, transparent 2px),
       radial-gradient(#ffffff04 2px, transparent 2px);
     background-size:
       60px 60px,
       20px 20px;
-    @apply relative rounded-md font-mono w-full h-full select-none;
+    @apply relative rounded-md bg-neutral-900/40 font-mono w-full h-full select-none;
   }
 
   /* Node */
   .node {
-    --node-x-padding: 8px;
+    --node-x-padding: 6px;
     --noodle-size: 12px;
     box-shadow: 0 6px 9px 4px #060606cd;
-    @apply absolute min-w-40 flex flex-col bg-neutral-800/80 backdrop-blur-xl rounded-md;
+    @apply absolute w-40 flex flex-col bg-neutral-800/80 backdrop-blur-xl rounded-md;
   }
   .node-header {
     padding: 3px var(--node-x-padding);
     @apply flex items-center gap-1 bg-emerald-900 rounded-t-md;
   }
-  .node-header.io {
-    padding: 3px var(--node-x-padding);
-    @apply flex items-center gap-1 bg-neutral-900 rounded-t-md;
-  }
   .node-name {
     text-shadow: 0 1px 3px #0007;
-    @apply font-medium;
+    @apply font-semibold;
   }
   .node-body {
-    padding: var(--node-x-padding);
-    @apply flex flex-col gap-1;
+    @apply flex font-light flex-col gap-1.5 p-(--node-x-padding) pt-2.5;
   }
   .node-ports {
-    @apply w-full flex flex-col;
+    @apply w-full flex flex-col gap-1.5;
   }
   .port {
     @apply flex items-center relative px-1.5;
@@ -191,22 +189,36 @@
     @apply left-0;
     transform: translateX(calc(-100% - var(--node-x-padding) + (var(--noodle-size) / 2)));
   }
+
   /* NodeFinder */
   .node-finder {
     @apply overflow-y-scroll rounded-lg backdrop-blur-3xl p-1 font-mono;
     box-shadow: 0 6px 9px 4px #060606cd;
   }
   .node-finder_inner {
-    @apply w-55 h-64 p-1 flex flex-col gap-1 overflow-x-hidden scroll-smooth;
+    @apply min-w-65 max-h-80 p-1 flex flex-col gap-1 overflow-x-hidden scroll-smooth;
     scroll-snap-type: mandatory;
   }
   .node-finder_inner::-webkit-scrollbar {
-    @apply bg-transparent w-2;
+    @apply bg-transparent w-1.5;
   }
   .node-finder_inner::-webkit-scrollbar-thumb {
-    @apply bg-neutral-700 rounded-full;
+    @apply bg-neutral-700/60 rounded-full;
   }
   .node-finder_inner::-webkit-scrollbar-thumb:hover {
-    @apply bg-neutral-600;
+    @apply bg-neutral-600/60;
+  }
+
+  /* Default Values and Input Fields */
+  .value-input input::-webkit-outer-spin-button,
+  .value-input input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  /* -> Firefox Fix */
+  .value-input input[type="number"] {
+    -moz-appearance: textfield;
+    appearance: textfield;
   }
 }

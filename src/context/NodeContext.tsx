@@ -6,6 +6,7 @@ interface INodeContext {
   setConnections: React.Dispatch<React.SetStateAction<Connection[]>>;
   nodes: TNode[];
   setNodes: React.Dispatch<React.SetStateAction<TNode[]>>;
+  updateNodeData: (nodeId: string, data: Record<string, number>) => void;
 }
 
 const NodeContext = createContext<INodeContext | null>(null);
@@ -14,6 +15,7 @@ const NodeProvider = ({ children }: { children: ReactNode }) => {
   const starterNodes: TNode[] = [
     {
       id: "in",
+      category: "io",
       name: "Input",
       inputs: [],
       outputs: [{ id: "I1", name: "Input" }],
@@ -24,6 +26,7 @@ const NodeProvider = ({ children }: { children: ReactNode }) => {
     },
     {
       id: "out",
+      category: "io",
       name: "Output",
       inputs: [{ id: "O1", name: "Output" }],
       outputs: [],
@@ -52,7 +55,13 @@ const NodeProvider = ({ children }: { children: ReactNode }) => {
     setConnections(starterConnections);
   }, []);
 
-  const contextValue = { nodes, setNodes, connections, setConnections };
+  const updateNodeData = (nodeId: string, data: Record<string, number>) => {
+    const node = nodes.find((n) => n.id === nodeId);
+    if (!node) return;
+    setNodes((prev) => prev.map((n) => (n.id == node.id ? { ...n, data: data } : n)));
+  };
+
+  const contextValue = { nodes, setNodes, connections, setConnections, updateNodeData };
 
   return <NodeContext.Provider value={contextValue}>{children}</NodeContext.Provider>;
 };
