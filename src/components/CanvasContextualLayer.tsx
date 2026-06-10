@@ -47,7 +47,7 @@ export const CanvasContextualLayer = ({
               def.name.toLowerCase().includes(searchTerm.toLowerCase()) && (
                 <ContextMenuItem
                   key={def.name}
-                  onSelect={() => onDefSelect(def)}
+                  onSelect={() => {onDefSelect(def); setSearchTerm("")}}
                   className="flex justify-between gap-1 items-center focus:bg-neutral-600/20 text-base font-normal text-neutral-400 focus:text-neutral-100 focus:font-semibold"
                 >
                   <p>{def.name}</p>
