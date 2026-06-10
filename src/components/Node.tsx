@@ -3,23 +3,30 @@ import type { TNode } from "../lib/types";
 import type React from "react";
 import { useRef, useState } from "react";
 import { useNodeContext } from "@/context/NodeContext";
+import { cn } from "@/lib/utils";
 
 export type NodeProps = {
   node: TNode;
+  active?: boolean;
+  className?: React.HTMLAttributes<HTMLDivElement>['className'];
   registerPort: (nodeId: string, portId: string, el: HTMLDivElement | null) => void;
   onDragStart: (nodeId: string, e: React.MouseEvent) => void;
   onOutputPortMouseDown: (nodeId: string, portId: string) => void;
   onInputMouseUp: (nodeId: string, portId: string) => void;
   onInputMouseDown: (nodeId: string, portId: string) => void;
+  onMouseDown?: (nodeId: string) => void;
 };
 
 const Node = ({
   node,
+  active,
+  className,
   registerPort,
   onDragStart,
   onOutputPortMouseDown,
   onInputMouseUp,
   onInputMouseDown,
+  onMouseDown,
 }: NodeProps) => {
   const [grabbing, setGrabbing] = useState(false);
 
@@ -32,7 +39,11 @@ const Node = ({
   };
 
   return (
-    <div className="node" style={{ top: node.position.y, left: node.position.x }}>
+    <div
+      className={cn(`node ${active && "outline outline-white/40"} transition-colors`, className)}
+      style={{ top: node.position.y, left: node.position.x }}
+      onMouseDown={() => onMouseDown?.(node.id)}
+    >
       <div
         className={`node-header ${node.category === "io" && " bg-neutral-900"}
                     ${node.category === "value" && " bg-pink-900"}

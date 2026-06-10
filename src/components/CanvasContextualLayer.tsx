@@ -13,10 +13,11 @@ import { useState } from "react";
 
 type CanvasContextualLayerProps = {
   onDefSelect: (def: NodeDefinition) => void;
+  onClick?: () => void;
 };
 
 export const CanvasContextualLayer = ({
-  onDefSelect: onDefSelect,
+  onDefSelect, onClick
 }: CanvasContextualLayerProps) => {
   const definitions = Object.values(Definitions);
 
@@ -24,7 +25,7 @@ export const CanvasContextualLayer = ({
 
   return (
     <ContextMenu>
-      <ContextMenuTrigger className="absolute top-0 left-0 w-full h-full">
+      <ContextMenuTrigger className="absolute top-0 left-0 w-full h-full" onClick={onClick}>
         <div />
       </ContextMenuTrigger>
       <ContextMenuContent className="bg-neutral-900/50 node-finder">
@@ -47,7 +48,10 @@ export const CanvasContextualLayer = ({
               def.name.toLowerCase().includes(searchTerm.toLowerCase()) && (
                 <ContextMenuItem
                   key={def.name}
-                  onSelect={() => {onDefSelect(def); setSearchTerm("")}}
+                  onSelect={() => {
+                    onDefSelect(def);
+                    setSearchTerm("");
+                  }}
                   className="flex justify-between gap-1 items-center focus:bg-neutral-600/20 text-base font-normal text-neutral-400 focus:text-neutral-100 focus:font-semibold"
                 >
                   <p>{def.name}</p>

@@ -15,6 +15,7 @@ const Canvas = () => {
   } | null>(null);
   const [pendingConnection, setPendingConnection] = useState<PendingConnection | null>(null);
   const [disconnecting, setDisconnecting] = useState<Omit<Connection, "id"> | null>(null);
+  const [activeNode, setActiveNode] = useState<TNode["id"] | null>(null);
 
   // Accessing Nodes & Connections and Setters from Context
   const { nodes, setNodes, connections, setConnections } = useNodeContext();
@@ -170,6 +171,10 @@ const Canvas = () => {
     setNodes((prev) => [...prev, newNode]);
   };
 
+  const activateNode = (nodeId: string) => {
+    setActiveNode(nodeId);
+  };
+
   return (
     <div
       id="canvasScreen"
@@ -183,16 +188,19 @@ const Canvas = () => {
         connections={connections}
         getPortPos={getPortPos}
       />
-      <CanvasContextualLayer onDefSelect={handleNodeAdd} />
+      <CanvasContextualLayer onClick={() => setActiveNode(null)} onDefSelect={handleNodeAdd} />
       {nodes.map((n) => (
         <Node
           key={n.id}
           node={n}
+          active={activeNode === n.id}
+          className={`${activeNode === n.id ? "z-50" : "z-10"}`}
           registerPort={registerPort}
           onDragStart={onDragStart}
           onOutputPortMouseDown={handlePendingConnection}
           onInputMouseUp={handleConnection}
           onInputMouseDown={handleDisconnect}
+          onMouseDown={activateNode}
         />
       ))}
     </div>
