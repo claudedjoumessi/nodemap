@@ -19,7 +19,7 @@ Interactive node-based graph editor built with React, TypeScript and Vite.
 First clone the repository into your local machine with:
 
 ```bash
-git clone https://github.com/claudedjoumessi/nodemap.git
+git clone https://github.com/claude-jr/nodemap.git
 ```
 
 Install dependencies and start the dev server:
@@ -58,4 +58,4 @@ Key npm scripts (from `package.json`):
 - `npm run preview` — preview production build
 
 ---
-Made with 🔥 by claudio.dev
+Made with 🔥 by claude-jr.
