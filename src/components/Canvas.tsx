@@ -13,7 +13,9 @@ const Canvas = () => {
     offsetX: number;
     offsetY: number;
   } | null>(null);
-  const [pendingConnection, setPendingConnection] = useState<PendingConnection | null>(null);
+  const [pendingConnection, setPendingConnection] = useState<PendingConnection | null>(
+    null,
+  );
   const [disconnecting, setDisconnecting] = useState<Omit<Connection, "id"> | null>(null);
   const [activeNode, setActiveNode] = useState<TNode["id"] | null>(null);
 
@@ -25,6 +27,7 @@ const Canvas = () => {
   const canvasRef = useRef<HTMLDivElement | null>(null);
 
   const registerPort = (nodeId: string, portId: string, el: HTMLDivElement | null) => {
+    // Registering port as nodeId.portId (eg: )
     if (el) portRefs.current[`${nodeId}.${portId}`] = el;
   };
 
@@ -80,7 +83,8 @@ const Canvas = () => {
       });
 
       setConnections(
-        (prev) => disconnectAt(disconnecting.targetNodeId, disconnecting.targetPortId) ?? prev,
+        (prev) =>
+          disconnectAt(disconnecting.targetNodeId, disconnecting.targetPortId) ?? prev,
       );
     }
     if (nodeDragging) {
@@ -127,7 +131,7 @@ const Canvas = () => {
     if (!pendingConnection) return;
     if (nodeId === pendingConnection.sourceNodeId) return;
     const newConn = {
-      id: `${nanoid()}`,
+      id: `${pendingConnection.sourceNodeId}.${pendingConnection.sourcePortId}_${nodeId}.${portId}`,
       sourceNodeId: pendingConnection.sourceNodeId,
       sourcePortId: pendingConnection.sourcePortId,
       targetNodeId: nodeId,
@@ -170,7 +174,7 @@ const Canvas = () => {
 
   const handleNodeAdd = (def: NodeDefinition) => {
     const newNode: TNode = {
-      id: def.type + nanoid(5),
+      id: def.name.toLowerCase().replaceAll(" ", "") + nanoid(3),
       category: def.type,
       name: def.name,
       inputs: def.inputs.map((inp) => {
@@ -184,10 +188,6 @@ const Canvas = () => {
       compute: def.compute,
     };
     setNodes((prev) => [...prev, newNode]);
-  };
-
-  const activateNode = (nodeId: string) => {
-    setActiveNode(nodeId);
   };
 
   return (
@@ -204,7 +204,10 @@ const Canvas = () => {
         getPortPos={getPortPos}
         worldToLocal={worldToLocal}
       />
-      <CanvasContextualLayer onClick={() => setActiveNode(null)} onDefSelect={handleNodeAdd} />
+      <CanvasContextualLayer
+        onClick={() => setActiveNode(null)}
+        onDefSelect={handleNodeAdd}
+      />
       {nodes.map((n) => (
         <Node
           key={n.id}
@@ -216,7 +219,7 @@ const Canvas = () => {
           onOutputPortMouseDown={handlePendingConnection}
           onInputMouseUp={handleConnection}
           onInputMouseDown={handleDisconnect}
-          onMouseDown={activateNode}
+          onMouseDown={setActiveNode}
         />
       ))}
     </div>

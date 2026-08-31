@@ -53,8 +53,8 @@ export const arcsine = registerDefinition({
   outputs: ["Angle"],
   expression: "asin(x)",
   compute(inputs) {
-    // return (x) => Math.asin(Math.max(-1, Math.min(1, inputs[0]?.(x) ?? 0)));
-    return (x) => Math.asin(inputs[0]?.(x) ?? 0);
+    return (x) => Math.asin(Math.max(-1, Math.min(1, inputs[0]?.(x) ?? 0)));
+    // return (x) => Math.asin(inputs[0]?.(x) ?? 0);
   },
 });
 
@@ -66,6 +66,7 @@ export const arccosine = registerDefinition({
   expression: "acos(x)",
   compute(inputs) {
     return (x) => Math.acos(Math.max(-1, Math.min(1, inputs[0]?.(x) ?? 0)));
+    // return (x) => Math.acos(inputs[0]?.(x) ?? 0);
   },
 });
 

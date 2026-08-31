@@ -5,11 +5,15 @@ import {
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
 import { Search } from "lucide-react";
-import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+} from "@/components/ui/input-group";
 
 import type { NodeDefinition } from "@/lib/NodeRegistry";
 import * as Definitions from "@/lib/NodeSchemas";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 type CanvasContextualLayerProps = {
   onDefSelect: (def: NodeDefinition) => void;
@@ -17,15 +21,20 @@ type CanvasContextualLayerProps = {
 };
 
 export const CanvasContextualLayer = ({
-  onDefSelect, onClick
+  onDefSelect,
+  onClick,
 }: CanvasContextualLayerProps) => {
   const definitions = Object.values(Definitions);
 
   const [searchTerm, setSearchTerm] = useState("");
+  const itemsRef = useRef<HTMLDivElement | null>(null);
 
   return (
     <ContextMenu>
-      <ContextMenuTrigger className="absolute top-0 left-0 w-full h-full" onClick={onClick}>
+      <ContextMenuTrigger
+        className="absolute top-0 left-0 w-full h-full"
+        onClick={onClick}
+      >
         <div />
       </ContextMenuTrigger>
       <ContextMenuContent className="bg-neutral-900/50 node-finder">
@@ -38,11 +47,11 @@ export const CanvasContextualLayer = ({
               onChange={(e) => setSearchTerm(e.target.value)}
             />
             <InputGroupAddon>
-              <Search opacity={0.7} />
+              <Search size={20} opacity={0.7} />
             </InputGroupAddon>
           </InputGroup>
         </div>
-        <div className="node-finder_inner">
+        <div className="node-finder_inner" ref={itemsRef}>
           {definitions.map(
             (def) =>
               def.name.toLowerCase().includes(searchTerm.toLowerCase()) && (

@@ -60,7 +60,7 @@ const GraphPlot = () => {
   };
 
   return (
-    <div className="relative w-full h-full bg-neutral-900/40 rounded-md">
+    <div className="relative w-full h-full bg-neutral-900/40 rounded-md overflow-hidden">
       <Line data={data} options={{ ...options, maintainAspectRatio: false } as any} />
     </div>
   );

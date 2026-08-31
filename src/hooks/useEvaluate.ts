@@ -1,4 +1,5 @@
 import type { Connection, TNode } from "@/lib/types";
+import { useCallback } from "react";
 
 type NodeCallback = (variable: number) => number;
 
@@ -28,9 +29,10 @@ export const useEvaluate = (nodes: TNode[], connections: Connection[]) => {
     if (!node) throw new Error("Couldn't read node at id: " + nodeId);
     const parents = getNodeParents(nodeId, nodes, connections);
     const inputs = parents.map((p) => evaluate(p.id));
-
+    // console.log("Reeval...")
     return node.compute(inputs);
-  };
+  // }, [getNodeParents()]);
+  }
 
   return { evaluate };
 };

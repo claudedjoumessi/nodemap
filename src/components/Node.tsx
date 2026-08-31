@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 export type NodeProps = {
   node: TNode;
   active?: boolean;
-  className?: React.HTMLAttributes<HTMLDivElement>['className'];
+  className?: React.HTMLAttributes<HTMLDivElement>["className"];
   registerPort: (nodeId: string, portId: string, el: HTMLDivElement | null) => void;
   onDragStart: (nodeId: string, e: React.MouseEvent) => void;
   onOutputPortMouseDown: (nodeId: string, portId: string) => void;
@@ -40,7 +40,10 @@ const Node = ({
 
   return (
     <div
-      className={cn(`node ${active && "outline outline-white/40"} transition-colors`, className)}
+      className={cn(
+        `node ${active && "outline outline-white/40"} transition-colors`,
+        className,
+      )}
       style={{ top: node.position.y, left: node.position.x }}
       onMouseDown={() => onMouseDown?.(node.id)}
     >
